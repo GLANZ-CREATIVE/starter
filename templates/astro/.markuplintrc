@@ -1,0 +1,16 @@
+{
+  "extends": ["markuplint:recommended"],
+  "parser": {
+    "\\.astro$": "@markuplint/astro-parser"
+  },
+  "rules": {
+    "head-element-order": false
+  },
+  "overrides": {
+    "src/layouts/BaseLayout.astro": {
+      "rules": {
+        "permitted-contents": false
+      }
+    }
+  }
+}

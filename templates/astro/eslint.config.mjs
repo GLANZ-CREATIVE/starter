@@ -12,7 +12,6 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,
-  ...astro.configs["jsx-a11y-recommended"],
   // IDE など cwd によっては plugin 内の @typescript-eslint/parser 解決が失敗し、
   // フロントマターが JS としてパースされ interface で落ちるため明示する
   {

@@ -18,6 +18,10 @@ pre-commit:
       run: pnpm exec stylelint --fix {staged_files}
       stage_fixed: true
 
+    - name: markuplint
+      glob: "*.astro"
+      run: pnpm exec markuplint {staged_files}
+
 pre-push:
   jobs:
     - name: check
