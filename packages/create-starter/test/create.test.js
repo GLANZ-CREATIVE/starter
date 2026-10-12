@@ -60,7 +60,6 @@ describe("validate", () => {
 describe("create", () => {
   let cwd;
   let commands;
-  let logs;
 
   const run = async (command, args, options) => {
     commands.push([command, ...args].join(" "));
@@ -70,7 +69,6 @@ describe("create", () => {
   beforeEach(async () => {
     cwd = await mkdtemp(join(tmpdir(), "create-starter-"));
     commands = [];
-    logs = [];
   });
 
   afterEach(async () => {
@@ -86,7 +84,6 @@ describe("create", () => {
       fetchTemplate: fromLocalDir(FIXTURE_ROOT),
       run,
       hasCommand: async () => true,
-      log: (message) => logs.push(message),
     });
 
   test("ドットファイルも含めて展開し、name だけを案件名に置き換える（ほかの書式は変えない）", async () => {
@@ -123,7 +120,6 @@ describe("create", () => {
       },
       run,
       hasCommand: async () => true,
-      log: (message) => logs.push(message),
     });
     assert.ok(commands.at(-1).endsWith("-m 参照元: GLANZ-CREATIVE/starter@main (0123456789abcdef0123456789abcdef01234567)"));
   });
@@ -134,7 +130,7 @@ describe("create", () => {
   });
 
   test("mise がなければ警告して pnpm を直接使う", async () => {
-    await create({
+    const { warnings } = await create({
       template: "vite",
       dir: "my-site",
       ref: "main",
@@ -142,22 +138,24 @@ describe("create", () => {
       fetchTemplate: fromLocalDir(FIXTURE_ROOT),
       run,
       hasCommand: async (name) => name !== "mise",
-      log: (message) => logs.push(message),
     });
     assert.ok(commands.includes("pnpm install --frozen-lockfile"));
     assert.ok(!commands.some((c) => c.startsWith("mise")));
-    assert.ok(logs.some((l) => l.includes("mise が見つかりません")));
+    assert.ok(warnings.some((warning) => warning.includes("mise が見つかりません")));
   });
 
-  test("wordpress のときだけ Docker の案内を出す", async () => {
-    await createSite("wordpress");
-    assert.ok(logs.some((l) => l.includes("Docker を起動してから pnpm start")));
-
-    logs = [];
-    commands = [];
-    await rm(join(cwd, "my-site"), { recursive: true });
-    await createSite("vite");
-    assert.ok(!logs.some((l) => l.includes("Docker")));
-    assert.ok(logs.some((l) => l.includes("pnpm dev")));
+  test("取得とインストールの順に進捗を出す", async () => {
+    const messages = [];
+    await create({
+      template: "vite",
+      dir: "my-site",
+      ref: "main",
+      cwd,
+      fetchTemplate: fromLocalDir(FIXTURE_ROOT),
+      run,
+      hasCommand: async () => true,
+      progress: (message) => messages.push(message),
+    });
+    assert.deepEqual(messages, ["テンプレートを取得しています", "依存関係をインストールしています"]);
   });
 });

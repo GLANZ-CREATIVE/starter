@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { stdin, stdout } from "node:process";
-import { createInterface } from "node:readline/promises";
+import { createRequire } from "node:module";
+import { stdin } from "node:process";
+
+import * as p from "@clack/prompts";
+import pc from "picocolors";
 
 import { create, fromGitHub, fromLocalDir, parseCliArgs } from "./lib/create.js";
-import { TEMPLATE_NAMES, TEMPLATES } from "./lib/templates.js";
+import { ask, PromptCancelled } from "./lib/prompt.js";
+import { formatNextSteps } from "./lib/templates.js";
 
-const USAGE = `使い方: pnpm create @glanz-creative/starter <テンプレート名> <フォルダ名> [--ref <タグかブランチ>]
-テンプレート名: ${TEMPLATE_NAMES.join(" / ")}`;
+const { version } = createRequire(import.meta.url)("./package.json");
 
 function run(command, args, options) {
   return new Promise((resolve, reject) => {
@@ -25,29 +28,16 @@ function hasCommand(command) {
   });
 }
 
-async function ask({ template, dir }) {
-  if (template && dir) return { template, dir };
-  if (!stdin.isTTY) throw new Error(`引数が足りません。\n${USAGE}`);
-
-  const rl = createInterface({ input: stdin, output: stdout });
-  try {
-    while (!TEMPLATES[template]) {
-      for (const [index, name] of TEMPLATE_NAMES.entries()) console.log(`  ${index + 1}) ${name} — ${TEMPLATES[name].description}`);
-      const answer = (await rl.question("テンプレート（番号か名前）: ")).trim();
-      template = TEMPLATE_NAMES[Number(answer) - 1] ?? answer;
-    }
-    while (!dir) dir = (await rl.question("フォルダ名: ")).trim();
-    return { template, dir };
-  } finally {
-    rl.close();
-  }
-}
+let spin;
 
 try {
   const args = parseCliArgs(process.argv.slice(2));
-  const { template, dir } = await ask(args);
+  p.intro(`${pc.bgCyan(pc.black(" create-starter "))} ${pc.dim(`v${version}`)}`);
+
+  const { template, dir } = await ask({ ...args, isTTY: stdin.isTTY });
   const localDir = process.env.CREATE_STARTER_LOCAL_DIR;
-  await create({
+
+  const { warnings } = await create({
     template,
     dir,
     ref: args.ref,
@@ -55,9 +45,26 @@ try {
     fetchTemplate: localDir ? fromLocalDir(localDir) : fromGitHub(),
     run,
     hasCommand,
-    log: console.log,
+    progress(message) {
+      if (!spin) {
+        spin = p.spinner();
+        spin.start(message);
+        return;
+      }
+      spin.message(message);
+    },
   });
+
+  spin?.stop(`${dir} に展開しました`);
+  for (const warning of warnings) p.log.warn(warning);
+  p.note(formatNextSteps(template, dir), "次のコマンド");
+  p.outro("準備ができました。GitHub にはまだ何も作っていません。");
 } catch (error) {
-  console.error(`✗ ${error.message}`);
+  if (error instanceof PromptCancelled) {
+    p.cancel(error.message);
+    process.exit(0);
+  }
+  if (spin) spin.error(error.message);
+  else p.log.error(error.message);
   process.exit(1);
 }
