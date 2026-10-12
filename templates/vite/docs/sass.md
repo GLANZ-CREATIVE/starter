@@ -133,12 +133,13 @@ dist
 
 ### 2-6. スクリプトの更新
 
-`package.json` の `scripts` のうち、次の 3 つを書き換えます。`lint:html` と `fix` は変更不要です。
+`package.json` の `scripts` のうち、次の 4 つを書き換えます。`lint:html` は変更不要です。`lint` と `check` はファイルを書き換えません。整形の自動適用は `format` と `fix` に残します。
 
 ```json
     "format": "biome format --write . && prettier --write \"src/**/*.{css,scss}\"",
-    "lint": "biome lint --write . && stylelint \"src/**/*.{css,scss}\" --fix",
-    "check": "biome check --write . && prettier --write \"src/**/*.{css,scss}\" && stylelint \"src/**/*.{css,scss}\" --fix",
+    "lint": "biome lint . && stylelint \"src/**/*.{css,scss}\" && pnpm lint:html",
+    "check": "biome check . && prettier --check \"src/**/*.{css,scss}\" && stylelint \"src/**/*.{css,scss}\"",
+    "fix": "biome check --write . && prettier --write \"src/**/*.{css,scss}\" && stylelint \"src/**/*.{css,scss}\" --fix && pnpm lint:html",
 ```
 
 ### 2-7. Git フックの更新
@@ -163,7 +164,7 @@ pre-commit:
       run: pnpm lint:html
 ```
 
-`pre-push` の `pnpm lint` は 2-6 で Stylelint を含む定義に変わるため、そのままで機能します。
+`pre-push` の `pnpm lint` は、2-6 のあと Stylelint と Markuplint を含む検査のままです。フック定義は変えなくてよいです。
 
 ### 2-8. エディタ設定
 

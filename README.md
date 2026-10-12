@@ -3,16 +3,16 @@
 Web サイト制作用のテンプレート。  
 ビルド環境と Lint を設定済みの WordPress、Vite、Astro のプロジェクトを生成します。
 
-| テンプレート | 内容                                                |
-| ------------ | --------------------------------------------------- |
-| `wordpress`  | WordPress（wp-env + Vite + Mailpit）。Docker が必要 |
-| `vite`       | Vite の静的サイト（Biome / Markuplint）             |
-| `astro`      | Astro の静的サイト（ESLint / Stylelint / Prettier） |
+| テンプレート | 内容                                                             |
+| ------------ | ---------------------------------------------------------------- |
+| `wordpress`  | WordPress（wp-env + Vite + Mailpit）。Docker が必要              |
+| `vite`       | Vite の静的サイト（Biome / Markuplint）                          |
+| `astro`      | Astro の静的サイト（ESLint / Stylelint / Prettier / Markuplint） |
 
 ## 使い方
 
 ```sh
-pnpm create @glanz-creative/starter <テンプレート名> <フォルダ名>
+pnpm create @glanz-creative/starter <テンプレート名> <プロジェクト名>
 
 # 例
 pnpm create @glanz-creative/starter vite my-site
@@ -20,7 +20,7 @@ pnpm create @glanz-creative/starter vite my-site
 
 - 事前に mise をインストールしておきます。
 - 引数を省くと、対話で聞かれます
-- 次の順に実行します: テンプレートの展開 → `package.json` の `name` の置き換え → `git init` → `mise install` → `pnpm install` → 最初のコミット
+- 次の順に実行します: テンプレートの展開 → `package.json` の `name` の置き換え → `git init` → `mise trust` → `mise install` → `pnpm install --frozen-lockfile` → 最初のコミット
 - GitHub にリポジトリは作らず、push もしません
 - テンプレートは実行のたびにこのリポジトリの `main` から取得します。取得したコミットは、最初のコミットの本文に `参照元: GLANZ-CREATIVE/starter@main (<SHA>)` として残ります
 - 過去の状態で作り直すときは、その SHA を `--ref` に渡します（ブランチやタグも指定できます）

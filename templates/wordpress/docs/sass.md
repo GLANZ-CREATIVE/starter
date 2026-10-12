@@ -10,21 +10,32 @@ pnpm add -D sass
 
 ## 部分ファイル（`_*.scss`）の運用
 
-`_variables.scss` のように `_` 始まりの部分ファイルを作り、既存の CSS エントリから `@import` で読み込みます。SCSS 同士の参照には `@use` / `@forward` を使います。
+変数や mixin は `_` 始まりの部分ファイルに置き、SCSS 同士で `@use` / `@forward` します。CSS からの `@import` は、Sass をコンパイルしたあとの CSS を取り込むだけです。`$primary` のような変数は CSS 側へ残りません。
 
 ```scss
 /* theme/src/assets/css/base/_variables.scss */
 $primary: #1a73e8;
 ```
 
+```scss
+/* theme/src/assets/css/components/_button.scss */
+@use "../base/variables" as *;
+
+.button {
+  color: $primary;
+}
+```
+
+コンパイル結果を既存のエントリへ載せるときは、CSS を出力する SCSS を `@import` します。
+
 ```css
 /* theme/src/assets/css/index.css */
-@import url("./base/variables.scss") layer(theme);
+@import url("./components/button.scss") layer(theme);
 ```
 
 このリポジトリは `@layer`（reset / theme）で重なり順を管理しています。読み込む位置のレイヤーを意識してください。
 
-ページ別のスタイルも同様に、対応する `css/pages/*.css` から部分ファイルを読み込みます。
+ページ別のスタイルも同様です。変数を使うページは `css/pages/` のファイルを `.scss` にして `@use` します。CSS のままにする場合は、CSS を出力する部分ファイルだけを `@import` します。
 
 ## エントリ自体を `.scss` にしたい場合
 

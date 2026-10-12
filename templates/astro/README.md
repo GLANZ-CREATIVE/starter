@@ -1,6 +1,6 @@
 # Astro Starter
 
-Astro 7 + TypeScript + ESLint + Stylelint + Prettier のテンプレート。
+Astro 7 + TypeScript + ESLint + Stylelint + Prettier + Markuplint のテンプレート。
 
 ## 技術スタック
 
@@ -11,10 +11,11 @@ Astro 7 + TypeScript + ESLint + Stylelint + Prettier のテンプレート。
 - [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
 - [astro-robots-txt](https://github.com/alextim/astro-lib/tree/main/packages/astro-robots-txt)
 - [kiso.css v1.2.4](https://github.com/tak-dcxi/kiso.css)（日本語Web向けリセットCSS）
-- [ESLint](https://eslint.org)（astro / typescript-eslint / jsx-a11y / simple-import-sort）
+- [ESLint](https://eslint.org)（astro / typescript-eslint / simple-import-sort）
 - [Stylelint](https://stylelint.io)（standard + recess-order）
 - [Prettier](https://prettier.io)（prettier-plugin-astro）
-- [Lefthook](https://github.com/evilmartians/lefthook)（pre-commit で format / lint を自動実行）
+- [Markuplint](https://markuplint.dev/)（`.astro` の HTML 検証）
+- [Lefthook](https://github.com/evilmartians/lefthook)（pre-commit で format / lint、pre-push で `pnpm check`）
 
 ## セットアップ
 
@@ -33,16 +34,16 @@ pnpm install
 
 ## コマンド
 
-| コマンド            | 説明                    |
-| :------------------ | :---------------------- |
-| `pnpm dev`          | 開発サーバー起動        |
-| `pnpm build`        | 本番ビルド              |
-| `pnpm preview`      | ビルドのプレビュー      |
-| `pnpm lint`         | ESLint + Stylelint      |
-| `pnpm lint:fix`     | 自動修正                |
-| `pnpm format`       | Prettier でフォーマット |
-| `pnpm format:check` | フォーマットチェック    |
-| `pnpm check`        | format:check + lint     |
+| コマンド            | 説明                                                    |
+| :------------------ | :------------------------------------------------------ |
+| `pnpm dev`          | 開発サーバー起動                                        |
+| `pnpm build`        | 本番ビルド                                              |
+| `pnpm preview`      | ビルドのプレビュー                                      |
+| `pnpm lint`         | ESLint + Stylelint + Markuplint                         |
+| `pnpm lint:fix`     | ESLint と Stylelint を自動修正（Markuplint は検査のみ） |
+| `pnpm format`       | Prettier でフォーマット                                 |
+| `pnpm format:check` | フォーマットチェック                                    |
+| `pnpm check`        | format:check + lint                                     |
 
 ## プロジェクト構成
 
