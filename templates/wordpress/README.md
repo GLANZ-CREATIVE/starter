@@ -28,15 +28,15 @@ pnpm start     # WordPress + Vite + Mailpit を起動
 
 ## よく使うコマンド
 
-| コマンド            | 説明                                 |
-| ------------------- | ------------------------------------ |
-| `pnpm start`        | WordPress + Vite + Mailpit を起動    |
-| `pnpm stop`         | 停止（データは残る）                 |
-| `pnpm destroy`      | 完全削除（データも消える）           |
-| `pnpm build`        | 本番用ビルド（`theme/dist/` に出力） |
-| `pnpm lint`         | prettier / stylelint / eslint        |
-| `pnpm dev`          | Vite だけ起動                        |
-| `pnpm wp-env start` | WordPress だけ起動                   |
+| コマンド            | 説明                                                                  |
+| ------------------- | --------------------------------------------------------------------- |
+| `pnpm start`        | WordPress + Vite + Mailpit を起動                                     |
+| `pnpm stop`         | 停止（データは残る）                                                  |
+| `pnpm destroy`      | wp-env のコンテナと DB を削除（`uploads/`・`sql/` と Mailpit は残る） |
+| `pnpm build`        | 本番用ビルド（`theme/dist/` に出力）                                  |
+| `pnpm lint`         | prettier / stylelint / eslint                                         |
+| `pnpm dev`          | Vite だけ起動                                                         |
+| `pnpm wp-env start` | WordPress だけ起動                                                    |
 
 > [!NOTE]
 > push 前に `pnpm lint` を実行してください。PHP は Prettier の対象外で、VS Code の Intelephense が保存時に整形します。
@@ -99,13 +99,11 @@ pnpm blocks:build              # 一括ビルド（pnpm build からも実行さ
 
 ## WordPress 本体のバージョン
 
-`.wp-env.json` の `core` は日本語版 7.1 系の zip（`wordpress-7.1-ja.zip`）を指し、最新パッチが自動で使われます。
+`.wp-env.json` の `core` は日本語版 7.1 系の zip（`wordpress-7.1-ja.zip`）を指します。zip は 7.1 系の最新パッチに更新されますが、wp-env はダウンロードをキャッシュします。取り込みには `--update` が必要です。マイナーバージョンを上げるときは URL の `7.1` を書き換えます。
 
 ```json
 "core": "https://ja.wordpress.org/wordpress-7.1-ja.zip"
 ```
-
-本体はキャッシュされるため、最新パッチの取り込みには `--update` が必要です。マイナーバージョンを上げるときは URL の `7.1` を書き換えます。
 
 ```bash
 pnpm wp-env start --update

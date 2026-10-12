@@ -7,6 +7,12 @@ import { TEMPLATE_NAMES, TEMPLATES } from "./templates.js";
 const REPO = "GLANZ-CREATIVE/starter";
 const PACKAGE_NAME = /^[a-z0-9][a-z0-9._-]*$/;
 
+export function invalidPackageNameReason(name) {
+  if (!PACKAGE_NAME.test(name)) {
+    return `「${name}」は package.json の name に使えません。小文字の英数字と - . _ だけにしてください。`;
+  }
+}
+
 export function parseCliArgs(argv) {
   const { values, positionals } = parseArgs({
     args: argv,
@@ -31,10 +37,8 @@ export async function validate({ template, dir, cwd }) {
   if (!TEMPLATES[template]) {
     throw new Error(`テンプレート「${template}」はありません。選べるのは ${TEMPLATE_NAMES.join(", ")} です。`);
   }
-  const name = basename(resolve(cwd, dir));
-  if (!PACKAGE_NAME.test(name)) {
-    throw new Error(`フォルダ名「${name}」は package.json の name に使えません。小文字の英数字と - . _ だけにしてください。`);
-  }
+  const reason = invalidPackageNameReason(basename(resolve(cwd, dir)));
+  if (reason) throw new Error(reason);
   if (!(await isEmptyOrMissing(resolve(cwd, dir)))) {
     throw new Error(`フォルダ「${dir}」は空ではありません。別の名前にするか、中身を移してください。`);
   }
@@ -80,21 +84,24 @@ async function rewritePackageNameKeepingFormat(dest, name) {
   await writeFile(path, renamed);
 }
 
-async function postSetup({ template, dest, source, run, hasCommand, log }) {
+async function postSetup({ template, dest, source, run, hasCommand, progress }) {
   const options = { cwd: dest };
+  const warnings = [];
   await run("git", ["init", "-b", "main"], options);
 
   // lefthook のフックを新しいリポジトリに入れるため、install は git init のあとに行う
+  progress("依存関係をインストールしています");
   if (await hasCommand("mise")) {
     await run("mise", ["trust"], options);
     await run("mise", ["install"], options);
     await run("mise", ["exec", "--", "pnpm", "install", "--frozen-lockfile"], options);
   } else {
-    log("⚠ mise が見つかりません。.mise.toml の Node / pnpm の版を手で合わせてください。");
+    warnings.push("mise が見つかりません。.mise.toml の Node / pnpm の版を手で合わせてください。");
     await run("pnpm", ["install", "--frozen-lockfile"], options);
   }
 
   await commitPristineTemplate({ template, source, run, options });
+  return warnings;
 }
 
 async function commitPristineTemplate({ template, source, run, options }) {
@@ -102,21 +109,15 @@ async function commitPristineTemplate({ template, source, run, options }) {
   await run("git", ["commit", "--no-verify", "-m", `chore: @glanz-creative/starter の ${template} テンプレートから作成`, "-m", source], options);
 }
 
-export async function create({ template, dir, ref, cwd, fetchTemplate, run, hasCommand, log }) {
+export async function create({ template, dir, ref, cwd, fetchTemplate, run, hasCommand, progress = () => {} }) {
   await validate({ template, dir, cwd });
   const dest = resolve(cwd, dir);
   const name = basename(dest);
 
-  log(`${template} テンプレート（${ref}）を ${dir} に展開します…`);
+  progress("テンプレートを取得しています");
   const { commit } = (await fetchTemplate({ template, ref, dest })) ?? {};
   await rewritePackageNameKeepingFormat(dest, name);
   const source = `参照元: ${REPO}@${ref}${commit ? ` (${commit})` : ""}`;
-  await postSetup({ template, dest, source, run, hasCommand, log });
-
-  log("");
-  log(`✓ ${dir} を作成しました。GitHub にはまだ何も作っていません。`);
-  log("");
-  log("次の手順:");
-  log(`  cd ${dir}`);
-  for (const step of TEMPLATES[template].nextSteps) log(`  ${step}`);
+  const warnings = await postSetup({ template, dest, source, run, hasCommand, progress });
+  return { warnings };
 }

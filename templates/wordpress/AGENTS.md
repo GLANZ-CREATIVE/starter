@@ -5,7 +5,7 @@ WordPress テーマ制作用のテンプレート。Vite でアセットをビ�
 ## 開発環境
 
 - Vite が停止中は、`pnpm build` 済みの `theme/dist` を自動で使う
-- `pnpm destroy` は環境をデータごと削除する
+- `pnpm destroy` は wp-env のコンテナとデータベースを削除する。`uploads/`・`sql/` と Mailpit は残る
 
 ## テーマ構成
 
