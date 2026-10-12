@@ -21,14 +21,14 @@
     "lefthook:run": "lefthook run"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.5",
-    "browserslist": "^4.28.7",
+    "@biomejs/biome": "^2.5.15",
+    "browserslist": "^4.29.3",
     "lefthook": "^2.2.1",
     "lightningcss": "^1.33.0",
     "markuplint": "^4.18.3",
-    "sharp": "^0.35.3",
-    "svgo": "^4.0.2",
-    "vite": "^8.1.5",
+    "sharp": "^0.35.5",
+    "svgo": "^4.1.0",
+    "vite": "^8.3.4",
     "vite-plugin-image-optimizer": "^2.0.3",
     "vite-plugin-sitemap": "^0.8.2"
   },
