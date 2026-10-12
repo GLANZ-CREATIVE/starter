@@ -1,6 +1,7 @@
 # starter
 
-サイト制作用のテンプレートです。ビルド環境と Lint を設定済みの WordPress、Vite、Astro のプロジェクトを生成します。
+Web サイト制作用のテンプレート。  
+ビルド環境と Lint を設定済みの WordPress、Vite、Astro のプロジェクトを生成します。
 
 | テンプレート | 内容                                                |
 | ------------ | --------------------------------------------------- |
@@ -12,11 +13,12 @@
 
 ```sh
 pnpm create @glanz-creative/starter <テンプレート名> <フォルダ名>
+
 # 例
 pnpm create @glanz-creative/starter vite my-site
 ```
 
-- 事前に mise をインストールしておきます。`npm create @glanz-creative/starter ...` でも動きます
+- 事前に mise をインストールしておきます。
 - 引数を省くと、対話で聞かれます
 - 次の順に実行します: テンプレートの展開 → `package.json` の `name` の置き換え → `git init` → `mise install` → `pnpm install` → 最初のコミット
 - GitHub にリポジトリは作らず、push もしません
