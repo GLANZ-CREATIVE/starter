@@ -79,4 +79,4 @@ export default {
 
 scoped `<style>` は、複雑な `@keyframes` アニメーションなどユーティリティで書きにくいものに限ります。`@apply` は使わず、テーマの値は `var(--color-accent)` のように CSS 変数で参照します。
 
-導入後は `.claude/rules/styling.md` も、トークンの定義先を `@theme` に、スタイルはユーティリティ基本に書き換えます。
+導入後は `AGENTS.md` のスタイリング節も、トークンの定義先を `@theme` に、スタイルはユーティリティ基本に書き換えます。

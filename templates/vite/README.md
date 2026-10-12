@@ -72,7 +72,7 @@ CSS の変換と圧縮には [lightningcss](https://lightningcss.dev/) を使用
 
 > [!NOTE]
 > Sass（SCSS）は標準では含まれていません。  
-> Biome は `.scss` を処理しないため、導入すると整形役と lint 役が空席になり、Prettier と Stylelint の追加が必要になります。  
+> Biome は `.scss` を処理しないため、導入すると整形と lint を担うツールがなくなり、Prettier と Stylelint の追加が必要になります。  
 > 代替可否の判断基準と移行手順は [docs/sass.md](docs/sass.md) にまとめています。
 
 ## 画像最適化
