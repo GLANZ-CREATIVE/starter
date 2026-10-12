@@ -1,0 +1,43 @@
+allowBuilds:
+  "@parcel/watcher": true
+  core-js: false
+  core-js-pure: false
+  fs-ext-extra-prebuilt: true
+  lefthook: true
+  sharp: true
+  unrs-resolver: true
+
+# @wordpress/scripts / @wordpress/env の間接依存（すべて devDependencies）に
+# 残る既知脆弱性を patched 版へ強制更新する。上流が更新されたら削除してよい。
+# 値はメジャー据え置きの範囲指定で、ビルドツールの破壊を避ける。
+# メジャー跨ぎが必要なもの（uuid 8→11）は破壊リスクが高く該当は moderate の
+# ため、上流更新を待つ方針で除外。uuid は sockjs の直接依存で、sockjs が
+# uuid 8 系の API 前提のため強制昇格すると壊れる。
+# extract-zip (symlink path traversal, high) は最新 2.0.1 でも patched 版が
+# 存在せず override 不可。@wordpress/env の間接依存でローカル開発時に
+# WordPress 公式 zip を展開する用途のみ。上流対応を待つ。
+# adm-zip (symlink 追従による任意ファイル上書き, moderate) は patched 版
+# >=0.6.1 が未公開（最新 0.6.0）のため、公開され次第 override を引き上げる。
+#
+# 記述ルール（過去に踏んだ罠）:
+# 1. 範囲は必ず上限（<N）付きで書く。上限を省くと `js-yaml@3: ">=3.15.1"` が
+#    5.x に解決されるなどメジャーを跨いでしまう。
+# 2. `pkg@1:` のようなキーは「どの依存元にマッチさせるか」のフィルタでしかなく、
+#    その版を誰も要求しなくなると黙って無効化される。実際 brace-expansion@1/@2 が
+#    死にキーになり 5.0.8（脆弱）へ浮上していた。バージョン指定なしを既定とする。
+overrides:
+  minimatch: ">=3.1.4"
+  serialize-javascript: ">=7.0.5"
+  linkify-it: ">=5.0.2"
+  adm-zip: ">=0.6.0"
+  fast-xml-parser: ">=5.10.1"
+  markdown-it: ">=14.1.2"
+  "@opentelemetry/core": ">=2.8.0"
+  body-parser@1: ">=1.20.6"
+  brace-expansion: ">=5.0.9 <6"
+  fast-uri: ">=4.1.2 <5"
+  js-yaml@3: ">=3.15.1 <4"
+  js-yaml@4: ">=4.3.1 <5"
+  ip-address: ">=10.3.1 <11"
+  postcss: ">=8.5.23 <9"
+  qs: ">=6.16.0 <7"

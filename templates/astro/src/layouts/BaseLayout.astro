@@ -1,0 +1,69 @@
+---
+import { Font } from "astro:assets";
+
+import { SEO } from "astro-seo";
+
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+}
+
+const { title, description, image, noindex = false } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = image ? new URL(image, Astro.site).toString() : undefined;
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-noto-sans-jp" preload />
+
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonicalURL}
+      noindex={noindex}
+      nofollow={noindex}
+      openGraph={{
+        basic: {
+          title,
+          type: "website",
+          image: ogImage ?? "",
+          url: canonicalURL,
+        },
+        optional: {
+          description,
+          siteName: "Astro Starter",
+          locale: "ja_JP",
+        },
+      }}
+      twitter={{
+        card: "summary_large_image",
+        title,
+        description,
+        image: ogImage,
+      }}
+    />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

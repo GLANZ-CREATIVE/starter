@@ -1,0 +1,15 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format
+      glob: "theme/**/*.{css,js,ts}"
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
+    - name: stylelint
+      glob: "theme/src/**/*.css"
+      run: pnpm exec stylelint --fix {staged_files}
+      stage_fixed: true
+    - name: eslint
+      glob: "theme/src/**/*.{js,ts}"
+      run: pnpm exec eslint --fix {staged_files}
+      stage_fixed: true

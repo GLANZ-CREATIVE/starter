@@ -1,0 +1,48 @@
+node_modules/
+
+.env
+.env.*
+!.env.example
+
+*.log
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+.idea/
+*.sw?
+
+.DS_Store
+._*
+Thumbs.db
+
+.claude/settings.local.json
+
+# ---- template specific ----
+/theme/dist/
+
+/sql/*
+!/sql/schema.sql
+!/sql/initial-data.sql
+
+!.vscode/tasks.json
+*.code-workspace
+
+# WordPress uploads（wp-env のマッピング先。メディアやプラグインの生成物）
+/uploads/*
+!/uploads/.gitkeep
+
+# Composer
+/vendor/
+
+# Block build output
+/theme/blocks/build/
+# create-block --no-plugin が blocks/ 直下に生成する隔離用 node_modules
+/theme/blocks/node_modules/
+
+# Generated responsive images
+/theme/src/assets/images/**/*-w[0-9]*.jpg
+/theme/src/assets/images/**/*-w[0-9]*.jpeg
+/theme/src/assets/images/**/*-w[0-9]*.png
+/theme/src/assets/images/**/*-w[0-9]*.webp

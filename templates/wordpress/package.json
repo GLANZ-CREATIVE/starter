@@ -1,0 +1,60 @@
+{
+  "name": "wp-env-starter",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@12.12.1",
+  "scripts": {
+    "prepare": "lefthook install",
+    "start": "wp-env start && pnpm mailpit:start && pnpm dev",
+    "stop": "wp-env stop && pnpm mailpit:stop",
+    "destroy": "wp-env destroy",
+    "wp-env": "wp-env",
+    "mailpit:start": "docker compose -f docker-compose.mailpit.yml up -d",
+    "mailpit:stop": "docker compose -f docker-compose.mailpit.yml down",
+    "dev": "vite",
+    "build": "pnpm blocks:build && vite build",
+    "blocks:build": "wp-scripts build --source-path=theme/blocks --output-path=theme/blocks/build",
+    "blocks:start": "wp-scripts start --source-path=theme/blocks --output-path=theme/blocks/build",
+    "blocks:new": "cd theme/blocks && pnpm dlx @wordpress/create-block@latest --no-plugin --namespace theme",
+    "backup:db": "pnpm wp-env run cli wp db export ./sql/backup-$(date +%Y%m%d).sql",
+    "backup:db:win": "powershell -Command \"pnpm wp-env run cli wp db export ./sql/backup-$(Get-Date -Format 'yyyyMMdd').sql\"",
+    "import:db": "pnpm wp-env run cli wp db import",
+    "patterns:flush": "pnpm wp-env run cli wp eval \"wp_get_theme()->delete_pattern_cache();\"",
+    "format": "prettier --write \"theme/**/*.{css,js,ts}\"",
+    "stylelint": "stylelint \"theme/src/**/*.css\" --fix",
+    "eslint": "eslint \"theme/src/**/*.{js,ts}\" --fix",
+    "test": "node --test",
+    "lint": "prettier --check \"theme/**/*.{css,js,ts}\" && stylelint \"theme/src/**/*.css\" && eslint \"theme/src/**/*.{js,ts}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@wordpress/env": "^11.16.0",
+    "@wordpress/scripts": "^36.0.0",
+    "browserslist": "^4.29.0",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
+    "globals": "^17.12.0",
+    "lefthook": "^2.2.1",
+    "lightningcss": "^1.33.0",
+    "prettier": "^3.9.9",
+    "sharp": "^0.35.4",
+    "stylelint": "^17.15.0",
+    "stylelint-config-recess-order": "^7.8.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-order": "^8.1.1",
+    "svgo": "^4.1.0",
+    "vite": "^8.3.1",
+    "vite-plugin-full-reload": "^1.2.0",
+    "vite-plugin-image-optimizer": "^2.0.3"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

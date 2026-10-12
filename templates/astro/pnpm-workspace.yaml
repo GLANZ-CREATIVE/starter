@@ -1,0 +1,4 @@
+# lefthook のフック登録は package.json の prepare で行い、esbuild は Vite が JS API 経由で使うため、どちらも postinstall は不要
+allowBuilds:
+  esbuild: false
+  lefthook: false

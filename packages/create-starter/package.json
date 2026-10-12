@@ -1,0 +1,31 @@
+{
+  "name": "@glanz-creative/create-starter",
+  "version": "0.1.0",
+  "description": "GLANZ CREATIVE のサイト制作用ひな形（wordpress / vite / astro）を手元に展開する",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-starter": "index.js"
+  },
+  "files": [
+    "index.js",
+    "lib"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GLANZ-CREATIVE/starter.git",
+    "directory": "packages/create-starter"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "giget": "^3.3.1"
+  }
+}

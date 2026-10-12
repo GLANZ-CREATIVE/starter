@@ -1,0 +1,4 @@
+{
+  "formatter": { "lineWidth": 150 },
+  "javascript": { "formatter": { "quoteStyle": "double", "trailingCommas": "all" } }
+}

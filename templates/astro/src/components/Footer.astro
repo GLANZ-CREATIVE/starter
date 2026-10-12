@@ -1,0 +1,35 @@
+---
+interface Props {
+  siteName?: string;
+}
+
+const { siteName = "Astro Starter" } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="footer__inner">
+    <small class="footer__copyright">
+      &copy; <time datetime={String(year)}>{year}</time> {siteName}
+    </small>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .footer__inner {
+    max-inline-size: 1200px;
+    padding-block: 1.5rem;
+    padding-inline: 1.5rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .footer__copyright {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+</style>

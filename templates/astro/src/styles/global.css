@@ -1,0 +1,25 @@
+@import "./kiso.css";
+
+/* ======================================================
+//  MARK: Design Tokens
+// ====================================================== */
+:root {
+  /* Typography */
+  --font-sans: var(--font-inter), var(--font-noto-sans-jp), system-ui, sans-serif;
+
+  /* Colors */
+  --color-bg: #fff;
+  --color-text: #111;
+  --color-text-muted: #666;
+  --color-border: #e5e5e5;
+  --color-accent: #0070f3;
+}
+
+/* ======================================================
+//  MARK: Base
+// ====================================================== */
+html {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}

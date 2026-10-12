@@ -1,0 +1,24 @@
+# https://lefthook.dev/configuration/
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: eslint
+      glob: "*.{js,mjs,cjs,ts,astro}"
+      run: pnpm exec eslint --fix {staged_files}
+      stage_fixed: true
+
+    - name: prettier
+      glob: "*.{js,mjs,cjs,ts,astro,css,json,md,yml,yaml}"
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
+
+    - name: stylelint
+      glob: "*.{css,astro}"
+      run: pnpm exec stylelint --fix {staged_files}
+      stage_fixed: true
+
+pre-push:
+  jobs:
+    - name: check
+      run: pnpm run check

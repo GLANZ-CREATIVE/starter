@@ -1,0 +1,36 @@
+:root {
+  --font-base: arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  --color-white: #fff;
+  --color-black: #000;
+  --color-ring: #2563eb;
+}
+
+html {
+  overflow-x: clip;
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: var(--font-base);
+  font-size: medium;
+  line-height: 1.8;
+  color: var(--color-black);
+  letter-spacing: 0.05em;
+  background: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--color-ring);
+  outline-offset: 1px;
+}

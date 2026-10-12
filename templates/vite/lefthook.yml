@@ -1,0 +1,11 @@
+pre-commit:
+  jobs:
+    - name: biome-check
+      run: pnpm biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    - name: lint-html
+      run: pnpm lint:html
+pre-push:
+  jobs:
+    - name: lint
+      run: pnpm lint

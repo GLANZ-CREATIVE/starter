@@ -1,0 +1,4 @@
+pre-commit:
+  jobs:
+    - run: x
+      stage_fixed: true

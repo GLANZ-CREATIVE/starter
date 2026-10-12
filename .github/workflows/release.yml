@@ -1,0 +1,34 @@
+# npm のトークンは置かず、Trusted Publishing（OIDC）で公開する。npm 側でこのリポジトリと release.yml を登録しておくこと。
+name: Release create-starter
+
+on:
+  push:
+    tags: ["create-starter@v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+      - name: タグと package.json の version が一致すること
+        working-directory: packages/create-starter
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          if [ "$TAG" != "create-starter@v$version" ]; then
+            echo "タグ $TAG と version $version が一致しません" >&2
+            exit 1
+          fi
+
+      - name: Publish
+        working-directory: packages/create-starter
+        run: npm publish --access public

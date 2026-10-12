@@ -1,0 +1,46 @@
+.container {
+  container-type: inline-size;
+}
+
+.lead {
+  display: block;
+  padding-block: 1em;
+  padding-inline: 1em;
+  container-type: inline-size;
+  font-size: 3.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+
+  @container (width <= 560px) {
+    font-size: 2rem;
+  }
+}
+
+.section {
+  padding-block: 1em;
+  container-type: inline-size;
+}
+
+.heading {
+  display: block;
+  padding-block: 1em;
+  padding-inline: 1em;
+  margin-block-end: 1em;
+  line-height: 1.4;
+  color: var(--color-white);
+  text-align: center;
+  text-wrap: balance;
+  background-color: color-mix(in srgb, var(--color-black) 90%, transparent);
+
+  @container (width <= 560px) {
+    color: var(--color-black);
+    background-color: color-mix(in srgb, var(--color-black) 24%, transparent);
+  }
+}
+
+.image {
+  width: 100%;
+  max-width: 400px;
+}

@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: create-starter と sync-shared のテスト
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - name: shared/ とテンプレートのずれ・版の食い違い
+        run: pnpm check:shared
+
+  gitleaks:
+    name: 秘密情報のスキャン
+    runs-on: ubuntu-latest
+    env:
+      GITLEAKS_VERSION: 8.30.1
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      # gitleaks-action は組織アカウントだとライセンスが要るので、公式のバイナリを直接使う
+      - name: Install gitleaks
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+      - name: Scan history
+        run: gitleaks git --redact --verbose .
+
+  list-templates:
+    name: テンプレート名の一覧
+    runs-on: ubuntu-latest
+    outputs:
+      names: ${{ steps.list.outputs.names }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: list
+        run: node --input-type=module -e 'import { TEMPLATE_NAMES } from "./packages/create-starter/lib/templates.js"; console.log(`names=${JSON.stringify(TEMPLATE_NAMES)}`)' >> "$GITHUB_OUTPUT"
+
+  templates:
+    name: ${{ matrix.template }} を展開して lint / build
+    needs: list-templates
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: ${{ fromJSON(needs.list-templates.outputs.names) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: starter
+      - uses: jdx/mise-action@v5
+        with:
+          working_directory: starter
+      - name: create-starter で展開する
+        run: |
+          git config --global user.name "ci"
+          git config --global user.email "ci@example.com"
+          node starter/packages/create-starter/index.js ${{ matrix.template }} site
+        env:
+          CREATE_STARTER_LOCAL_DIR: ${{ github.workspace }}/starter
+      - name: Lint
+        working-directory: site
+        run: pnpm lint
+      - name: Test
+        working-directory: site
+        run: pnpm run --if-present test
+      - name: Build
+        working-directory: site
+        run: pnpm build
+      - name: build で追跡ファイルが変わっていないこと
+        working-directory: site
+        run: git diff --exit-code
