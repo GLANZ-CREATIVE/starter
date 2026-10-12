@@ -72,12 +72,12 @@ pnpm import:db ./sql/backup-XXXX.sql  # リストア
   background-image: url("../../images/example.png");
   ```
 
-  PNG / JPEG / TIFF は元の拡張子のまま書けば、ビルド時にハッシュ付きの `.webp` へ変換され参照も書き換わります。`.webp` の直接参照も可。
+  PNG / JPEG / TIFF は元の拡張子のまま書けば、ビルド時にハッシュ付きの `.webp` へ変換され参照も書き換わります。`.webp` を直接参照することもできます。
 
 - **テーマ直下のファイル**: `public_url('ogp.png')`
 
 > [!NOTE]
-> 詳細は [functions/vite.php](theme/functions/vite.php) と [functions/assets.php](theme/functions/assets.php) を参照。
+> 詳細は [functions/vite.php](theme/functions/vite.php) と [functions/assets.php](theme/functions/assets.php) を参照してください。
 
 ## CSS 拡張
 
@@ -99,7 +99,7 @@ pnpm blocks:build              # 一括ビルド（pnpm build からも実行さ
 
 ## WordPress 本体のバージョン
 
-`.wp-env.json` の `core` は日本語版 7.1 系の最新（`wordpress-7.1-ja.zip`）を指します。7.1 系の最新パッチが自動で使われます。
+`.wp-env.json` の `core` は日本語版 7.1 系の zip（`wordpress-7.1-ja.zip`）を指し、最新パッチが自動で使われます。
 
 ```json
 "core": "https://ja.wordpress.org/wordpress-7.1-ja.zip"
