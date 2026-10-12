@@ -107,8 +107,30 @@ describe("create", () => {
       "mise install",
       "mise exec -- pnpm install --frozen-lockfile",
       "git add -A",
-      'git commit --no-verify -m chore: @glanz-creative/starter の vite テンプレートから作成',
+      "git commit --no-verify -m chore: @glanz-creative/starter の vite テンプレートから作成 -m 参照元: GLANZ-CREATIVE/starter@main",
     ]);
+  });
+
+  test("取得元のコミットがわかれば、最初のコミットの本文に参照元として残す", async () => {
+    await create({
+      template: "vite",
+      dir: "my-site",
+      ref: "main",
+      cwd,
+      fetchTemplate: async (args) => {
+        await fromLocalDir(FIXTURE_ROOT)(args);
+        return { commit: "0123456789abcdef0123456789abcdef01234567" };
+      },
+      run,
+      hasCommand: async () => true,
+      log: (message) => logs.push(message),
+    });
+    assert.ok(commands.at(-1).endsWith("-m 参照元: GLANZ-CREATIVE/starter@main (0123456789abcdef0123456789abcdef01234567)"));
+  });
+
+  test("コミットがわからなくても ref だけは残す", async () => {
+    await createSite("vite");
+    assert.ok(commands.at(-1).endsWith("-m 参照元: GLANZ-CREATIVE/starter@main"));
   });
 
   test("mise がなければ警告して pnpm を直接使う", async () => {
