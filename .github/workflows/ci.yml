@@ -62,6 +62,9 @@ jobs:
       - uses: jdx/mise-action@v5
         with:
           working_directory: starter
+      - name: create-starter の依存を入れる
+        working-directory: starter
+        run: pnpm install --frozen-lockfile
       - name: create-starter で展開する
         run: |
           git config --global user.name "ci"
