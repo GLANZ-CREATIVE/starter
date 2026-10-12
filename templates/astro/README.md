@@ -1,11 +1,11 @@
 # Astro Starter
 
-Astro 7 + TypeScript strict + ESLint + Stylelint + Prettier のスターターテンプレート。
+Astro 7 + TypeScript + ESLint + Stylelint + Prettier のテンプレート。
 
 ## 技術スタック
 
-- [Astro 7](https://astro.build)（SSG）
-- TypeScript strict
+- [Astro 7](https://astro.build)
+- TypeScript
 - [Astro Fonts API](https://docs.astro.build/en/guides/fonts/)（Inter + Noto Sans JP をセルフホスト）
 - [astro-seo](https://github.com/jonasmerlin/astro-seo)（OG / Twitter Card 対応）
 - [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
@@ -84,7 +84,7 @@ export default defineConfig({
 
 ## CSS の拡張
 
-素の CSS のまま使う前提ですが、必要に応じて次の手順で拡張できます。
+Sass や Tailwind CSS は次の手順で足せます。
 
 - [Sass を使う](docs/sass.md)
 - [Tailwind CSS を使う](docs/tailwind.md)
