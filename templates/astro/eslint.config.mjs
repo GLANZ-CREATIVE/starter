@@ -36,6 +36,22 @@ export default [
     },
   },
   {
+    files: ["**/*.astro"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "JSXOpeningElement[name.name='br']",
+          message: "<br> は使わない。改行したい位置で <span> に分け、CSS で display: block（または inline-block）にする。詩など必要な箇所だけ eslint-disable で外す",
+        },
+        {
+          selector: "JSXAttribute[name.name='style']",
+          message: 'style="" は使わない。クラス経由で <style>（scoped）かグローバル CSS に書く',
+        },
+      ],
+    },
+  },
+  {
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },

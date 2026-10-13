@@ -5,12 +5,10 @@ Vite ベースの静的サイト制作テンプレート。
 ## 作業の流れ
 
 - 作業を終える前に `pnpm fix`（Biome fix + Markuplint）を実行する
-- ユーザーへの回答は日本語で行う
 
-## JavaScript
+## 規約
 
-- 本番コードで `console.log` を使わない。必要な場合は `// biome-ignore lint/suspicious/noConsole: <理由>` を付ける
-- 非同期処理は `try...catch` で扱う
+- コメントは「why」「why not」のみ。意図的負債は `FIXME` + 理由
 
 ## CSS
 
@@ -18,8 +16,3 @@ Vite ベースの静的サイト制作テンプレート。
 
 - `reset`: リセット
 - `theme`: デザイントークンとベース要素
-
-## HTML
-
-- `.markuplintrc` のルールに従う
-- セマンティックなタグと ARIA を維持する
