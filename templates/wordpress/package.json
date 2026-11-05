@@ -30,7 +30,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@wordpress/env": "^11.17.0",
-    "@wordpress/scripts": "^36.1.0",
+    "@wordpress/scripts": "^37.0.0",
     "browserslist": "^4.29.5",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
