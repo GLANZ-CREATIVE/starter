@@ -1,4 +1,5 @@
-// 差分を重ねた内容を一時フォルダに組み立て、その lockfile を差分のフォルダへ書き戻す
+// 差分を重ねた内容を一時フォルダに組み立て、その lockfile を差分のフォルダへ書き戻す。
+// 差分の古い lockfile ではなく共通部分の lockfile から解決し直すので、共通部分で上げた間接依存の版（lockfile だけの更新）も差分に届く
 import { execFileSync } from "node:child_process";
 import { copyFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -22,6 +23,7 @@ for (const [css, { overlay }] of Object.entries(CSS_METHODS)) {
     try {
       await fromLocalDir(root)({ template, css, dest });
       await applyVariantManifest(dest);
+      await copyFile(join(root, "templates", template, "pnpm-lock.yaml"), join(dest, "pnpm-lock.yaml"));
       console.log(`→ ${overlay}/${template}`);
       execFileSync("pnpm", ["install", "--lockfile-only"], { cwd: dest, stdio: "inherit" });
       await copyFile(join(dest, "pnpm-lock.yaml"), join(root, overlay, template, "pnpm-lock.yaml"));

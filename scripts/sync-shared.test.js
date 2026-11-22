@@ -213,4 +213,15 @@ describe("sync と check", () => {
       "variants/tailwind/laravel が create-starter の TEMPLATES にない",
     ]);
   });
+
+  test("pnpm-workspace.yaml の overrides に上限（<N）のない範囲があると報告する", async () => {
+    await sync(root);
+    await writeFile(
+      join(root, "templates/wordpress/pnpm-workspace.yaml"),
+      'allowBuilds:\n  sharp: true\n\noverrides:\n  minimatch: ">=3.1.4"\n  qs: ">=6.16.0 <7"\n  vite@*: "catalog:"\n',
+    );
+    assert.deepEqual(await check(root), [
+      'templates/wordpress/pnpm-workspace.yaml の overrides の minimatch: ">=3.1.4" に上限（<N）がない（メジャー版を黙って越える）',
+    ]);
+  });
 });

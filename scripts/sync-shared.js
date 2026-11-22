@@ -168,6 +168,29 @@ async function loadFormatterConfig(root, t) {
   }
 }
 
+// pnpm-workspace.yaml の overrides の「キー: 値」を返す
+function parseOverrides(yaml) {
+  const lines = yaml.split("\n");
+  const start = lines.findIndex((line) => /^overrides:\s*$/.test(line));
+  if (start === -1) return [];
+  const overrides = [];
+  for (const line of lines.slice(start + 1)) {
+    if (/^\S/.test(line)) break;
+    const match = line.match(/^\s+("[^"]+"|'[^']+'|[^\s:#][^:]*):\s*(.+?)\s*$/);
+    if (match) overrides.push({ key: match[1].replace(/^["']|["']$/g, ""), value: match[2].replace(/^["']|["']$/g, "") });
+  }
+  return overrides;
+}
+
+async function checkOverrideBounds(root, t) {
+  const path = `templates/${t}/pnpm-workspace.yaml`;
+  const yaml = await readOptional(join(root, path));
+  if (yaml === undefined) return [];
+  return parseOverrides(yaml)
+    .filter(({ value }) => value.includes(">") && !value.includes("<"))
+    .map(({ key, value }) => `${path} の overrides の ${key}: "${value}" に上限（<N）がない（メジャー版を黙って越える）`);
+}
+
 async function listFiles(dir) {
   try {
     const entries = await readdir(dir, { recursive: true, withFileTypes: true });
@@ -313,6 +336,8 @@ export async function check(root) {
   if (/^\s*-\s*["']?(\.\/)?templates\b/m.test(workspace)) {
     problems.push("pnpm-workspace.yaml に templates/ を入れない（各テンプレートは自分の lockfile を持つ単体のプロジェクト）");
   }
+
+  for (const t of TEMPLATES) problems.push(...(await checkOverrideBounds(root, t)));
 
   problems.push(...(await checkVariants(root, new Set(expected.map(({ target }) => target)))));
 
