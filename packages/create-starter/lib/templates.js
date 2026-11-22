@@ -2,6 +2,7 @@ export const TEMPLATES = {
   wordpress: { commands: ["pnpm start"], footnote: "Docker を起動してから実行してください。" },
   vite: { commands: ["pnpm dev"] },
   astro: { commands: ["pnpm dev"] },
+  webapp: { commands: ["pnpm dev"] },
 };
 
 export const TEMPLATE_NAMES = Object.keys(TEMPLATES);

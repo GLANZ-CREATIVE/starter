@@ -20,10 +20,10 @@ Web サイト制作用テンプレート（`wordpress` / `vite` / `astro`）と�
 
 ## 注意
 
-- このリポジトリ内でテンプレートのフォルダに `pnpm install` をしない。`prepare` の `lefthook install` がこのリポジトリの `.git` にフックを入れる（`LEFTHOOK=0` では止まらない）。lockfile 更新は `pnpm install --lockfile-only`
+- このリポジトリ内でテンプレートのフォルダに `pnpm install` をしない。`prepare` の `lefthook install`（`webapp` は `vp config`）がこのリポジトリの `.git` にフックを入れる（`LEFTHOOK=0` では止まらない）。lockfile 更新は `pnpm install --lockfile-only`
 - Node / pnpm の版を上げるときは `shared/.mise.toml` と各テンプレートの `package.json`（`packageManager`, `engines.node`）をそろえる
-- `check:shared` は次も強制する: テンプレート間で lefthook の版が同じ、`lefthook.yml` は `jobs:` を使い pre-commit に `stage_fixed: true`、フォーマッタの行幅 150・ダブルクォート・末尾カンマ
-- テンプレートを足すときは `lib/templates.js`、`scripts/sync-shared.js` の `RESET_CSS_PATHS`、`.github/dependabot.yml` を更新し、create-starter を公開し直す
+- `check:shared` は次も強制する: lefthook を使うテンプレート間で lefthook の版が同じ、`lefthook.yml` は `jobs:` を使い pre-commit に `stage_fixed: true`、`webapp` は `.vite-hooks/pre-commit` で `vp staged`、フォーマッタの行幅 150・ダブルクォート・末尾カンマ（`webapp` は `vite.config.ts` の `fmt`）
+- テンプレートを足すときは `lib/templates.js`、`lib/prompt.js` の `PRESENTATION`、`scripts/sync-shared.js` の `RESET_CSS_PATHS` / `FORMATTER_CONFIGS` / `GIT_HOOKS`、`.github/dependabot.yml` を更新し、create-starter を公開し直す
 
 ## テンプレートの AGENTS.md
 

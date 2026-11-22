@@ -108,12 +108,27 @@ describe("sync と check", () => {
       join(root, "templates/vite/biome.json"),
       '{ "formatter": { "lineWidth": 150 }, "javascript": { "formatter": { "quoteStyle": "single", "trailingCommas": "all" } } }\n',
     );
+    await writeFile(
+      join(root, "templates/webapp/vite.config.ts"),
+      'import { defineConfig } from "vite-plus";\n\nexport default defineConfig({ fmt: { singleQuote: true } });\n',
+    );
     assert.deepEqual(await check(root), [
       "templates/vite/biome.json の引用符が double ではない（single）",
       "templates/astro/.prettierrc.mjs の行幅が 150 ではない（80）",
       "templates/astro/.prettierrc.mjs の引用符が double ではない（single）",
       "templates/astro/.prettierrc.mjs の末尾カンマが all ではない（es5）",
+      "templates/webapp/vite.config.ts の行幅が 150 ではない（100）",
+      "templates/webapp/vite.config.ts の引用符が double ではない（single）",
     ]);
+  });
+
+  test("Vite+ のフックの pre-commit がない、または vp staged を実行しないと報告する", async () => {
+    await sync(root);
+    const hook = join(root, "templates/webapp/.vite-hooks/pre-commit");
+    await writeFile(hook, "vp check\n");
+    assert.deepEqual(await check(root), ["templates/webapp/.vite-hooks/pre-commit が vp staged を実行しない（整形結果をコミットに含める）"]);
+    await rm(hook);
+    assert.deepEqual(await check(root), ["templates/webapp/.vite-hooks/pre-commit がない"]);
   });
 
   test("pre-commit が整形結果をコミットに含めない（stage_fixed がない）と報告する", async () => {

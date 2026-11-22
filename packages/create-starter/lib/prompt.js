@@ -21,6 +21,7 @@ const PRESENTATION = {
   wordpress: { title: "WordPress", hint: "Docker が必要なテーマ開発", color: paint("#21759B") },
   vite: { title: "Vite", hint: "HTML の静的サイト", color: paint("#646CFF") },
   astro: { title: "Astro", hint: "コンポーネントの静的サイト", color: paint("#FF5D01") },
+  webapp: { title: "Web アプリ", hint: "React + Hono のモノレポ（Vite+）", color: paint("#61DAFB") },
 };
 
 export class PromptCancelled extends Error {

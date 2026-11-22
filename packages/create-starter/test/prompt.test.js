@@ -68,6 +68,7 @@ describe("ask", () => {
         { value: "wordpress", label: "WordPress  Docker が必要なテーマ開発" },
         { value: "vite", label: "Vite  HTML の静的サイト" },
         { value: "astro", label: "Astro  コンポーネントの静的サイト" },
+        { value: "webapp", label: "Web アプリ  React + Hono のモノレポ（Vite+）" },
       ],
     );
   });

@@ -1,13 +1,14 @@
 # starter
 
 Web サイト制作用のテンプレート。  
-ビルド環境と Lint を設定済みの WordPress、Vite、Astro のプロジェクトを生成します。
+ビルド環境と Lint を設定済みの WordPress、Vite、Astro、Web アプリのプロジェクトを生成します。
 
-| テンプレート | 内容                                                             |
-| ------------ | ---------------------------------------------------------------- |
-| `wordpress`  | WordPress（wp-env + Vite + Mailpit）。Docker が必要              |
-| `vite`       | Vite の静的サイト（Biome / Markuplint）                          |
-| `astro`      | Astro の静的サイト（ESLint / Stylelint / Prettier / Markuplint） |
+| テンプレート | 内容                                                                   |
+| ------------ | ---------------------------------------------------------------------- |
+| `wordpress`  | WordPress（wp-env + Vite + Mailpit）。Docker が必要                    |
+| `vite`       | Vite の静的サイト（Biome / Markuplint）                                |
+| `astro`      | Astro の静的サイト（ESLint / Stylelint / Prettier / Markuplint）       |
+| `webapp`     | React + Hono の Web アプリ。pnpm workspace のモノレポ（Vite+ / zod） |
 
 ## 使い方
 
