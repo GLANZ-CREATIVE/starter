@@ -27,7 +27,7 @@ pnpm create @glanz-creative/starter vite my-site --css tailwind
 ```
 
 - 事前に mise をインストールしておきます。
-- 引数を省くと、対話で聞かれます。対話できない環境（CI など）では、すべて引数で渡します
+- 引数を省くと、対話で聞かれます。対話できない環境（CI など）では、すべて引数で渡します。`--help` で使い方を表示します
 - 次の順に実行します: テンプレートの展開（Tailwind CSS なら差分を重ねる） → `package.json` の `name` の置き換え → `git init` → `mise trust` → `mise install` → `pnpm install --frozen-lockfile` → 最初のコミット
 - GitHub にリポジトリは作らず、push もしません
 - テンプレートは実行のたびにこのリポジトリの `main` から取得します。取得したコミットは、最初のコミットの本文に `参照元: GLANZ-CREATIVE/starter@main (<SHA>)` として残ります

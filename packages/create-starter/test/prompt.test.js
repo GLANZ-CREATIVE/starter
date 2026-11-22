@@ -44,6 +44,14 @@ describe("ask", () => {
     await assert.rejects(ask({ isTTY: false, prompts: prompts({}) }), /使い方/);
   });
 
+  test("対話できないときは、揃った引数をそのまま返し、値の誤りは展開前の検証に任せる", async () => {
+    assert.deepEqual(await ask({ template: "vite", dir: "my-site", css: "sass", isTTY: false, prompts: prompts({}) }), {
+      template: "vite",
+      dir: "my-site",
+      css: "sass",
+    });
+  });
+
   test("対話できないときは CSS の方式も引数で必要", async () => {
     await assert.rejects(ask({ template: "vite", dir: "my-site", isTTY: false, prompts: prompts({}) }), /--css <vanilla \/ tailwind>/);
   });
@@ -159,12 +167,15 @@ describe("ask", () => {
 });
 
 describe("formatNextSteps", () => {
-  test("起動コマンドを、移動してから実行する順で出す", () => {
-    assert.equal(formatNextSteps("vite", "my-site"), "cd my-site\npnpm dev");
-    assert.equal(formatNextSteps("astro", "my-site"), "cd my-site\npnpm dev");
+  test("起動コマンドを、移動してから実行する順で出し、CSS の書き方の置き場を添える", () => {
+    assert.equal(formatNextSteps("vite", "my-site"), "cd my-site\npnpm dev\n\nCSS の書き方は docs/css.md にあります。");
+    assert.equal(formatNextSteps("astro", "my-site"), "cd my-site\npnpm dev\n\nCSS の書き方は docs/css.md にあります。");
   });
 
   test("wordpress では Docker を起動してから pnpm start するよう案内する", () => {
-    assert.equal(formatNextSteps("wordpress", "client"), "cd client\npnpm start\n\nDocker を起動してから実行してください。");
+    assert.equal(
+      formatNextSteps("wordpress", "client"),
+      "cd client\npnpm start\n\nDocker を起動してから実行してください。\nCSS の書き方は docs/css.md にあります。",
+    );
   });
 });

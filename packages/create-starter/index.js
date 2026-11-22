@@ -8,17 +8,10 @@ import pc from "picocolors";
 
 import { create, fromGitHub, fromLocalDir, parseCliArgs } from "./lib/create.js";
 import { ask, PromptCancelled } from "./lib/prompt.js";
-import { formatNextSteps } from "./lib/templates.js";
+import { runQuietly } from "./lib/run.js";
+import { formatNextSteps, USAGE } from "./lib/templates.js";
 
 const { version } = createRequire(import.meta.url)("./package.json");
-
-function run(command, args, options) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { ...options, stdio: "inherit" });
-    child.on("error", reject);
-    child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`${command} ${args.join(" ")} が失敗しました（終了コード ${code}）`))));
-  });
-}
 
 function hasCommand(command) {
   return new Promise((resolve) => {
@@ -31,8 +24,13 @@ function hasCommand(command) {
 let spin;
 
 try {
-  const args = parseCliArgs(process.argv.slice(2));
   p.intro(`${pc.bgCyan(pc.black(" create-starter "))} ${pc.dim(`v${version}`)}`);
+  const args = parseCliArgs(process.argv.slice(2));
+  if (args.help) {
+    p.note(USAGE, "使い方");
+    p.outro("引数を省くと、対話で聞きます。");
+    process.exit(0);
+  }
 
   const { template, dir, css } = await ask({ ...args, isTTY: stdin.isTTY });
   const localDir = process.env.CREATE_STARTER_LOCAL_DIR;
@@ -44,7 +42,7 @@ try {
     ref: args.ref,
     cwd: process.cwd(),
     fetchTemplate: localDir ? fromLocalDir(localDir) : fromGitHub(),
-    run,
+    run: runQuietly,
     hasCommand,
     progress(message) {
       if (!spin) {
