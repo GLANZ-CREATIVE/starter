@@ -1,0 +1,1 @@
+{"name":"webapp","type":"module","packageManager":"pnpm@12.12.1","engines":{"node":">=24"},"devDependencies":{"vite-plus":"1.7.0"}}

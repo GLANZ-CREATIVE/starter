@@ -1,4 +1,5 @@
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
+import { registerHooks } from "node:module";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -10,6 +11,7 @@ const RESET_CSS_PATHS = {
   wordpress: "theme/src/assets/css/base/reset.css",
   vite: "src/assets/css/base/reset.css",
   astro: null,
+  webapp: null,
 };
 
 export function resetCssTargets(templates, paths) {
@@ -41,11 +43,27 @@ const fromPrettier = (config) => ({
   trailingCommas: config.trailingComma ?? "all",
 });
 
+const fromOxfmt = ({ fmt = {} }) => ({
+  lineWidth: fmt.printWidth ?? 100,
+  quote: fmt.singleQuote ? "single" : "double",
+  trailingCommas: fmt.trailingComma ?? "all",
+});
+
 const FORMATTER_CONFIGS = {
   wordpress: { file: ".prettierrc.json", read: fromPrettier },
   vite: { file: "biome.json", read: fromBiome },
   astro: { file: ".prettierrc.mjs", read: fromPrettier },
+  webapp: { file: "vite.config.ts", read: fromOxfmt },
 };
+
+const GIT_HOOKS = { wordpress: "lefthook", vite: "lefthook", astro: "lefthook", webapp: "vite-plus" };
+
+const VITE_PLUS_WITHOUT_INSTALL = "data:text/javascript,export const defineConfig = (config) => config;";
+
+registerHooks({
+  resolve: (specifier, context, nextResolve) =>
+    specifier === "vite-plus" ? { url: VITE_PLUS_WITHOUT_INSTALL, shortCircuit: true } : nextResolve(specifier, context),
+});
 
 async function loadConfig(path) {
   if (path.endsWith(".json")) return JSON.parse(await readFile(path, "utf8"));
@@ -106,6 +124,44 @@ async function exists(path) {
   }
 }
 
+async function checkLefthook(root, t) {
+  const problems = [];
+  const config = await readOptional(join(root, `templates/${t}/lefthook.yml`));
+  if (config === undefined) problems.push(`templates/${t}/lefthook.yml がない`);
+  else if (/^\s+commands:/m.test(config)) problems.push(`templates/${t}/lefthook.yml が commands: を使っている（jobs: に統一する）`);
+  else if (!/^\s+stage_fixed:\s*true/m.test(config)) {
+    problems.push(`templates/${t}/lefthook.yml の pre-commit に stage_fixed: true がない（整形結果をコミットに含める）`);
+  }
+  if (await exists(join(root, `templates/${t}/.lefthook.yml`))) problems.push(`templates/${t}/.lefthook.yml は lefthook.yml に改名する`);
+  return problems;
+}
+
+// vp staged は lint-staged なので、整形で変わったファイルはそのままコミットに含まれる
+async function checkVitePlusHooks(root, t, config) {
+  const problems = [];
+  const path = `templates/${t}/.vite-hooks/pre-commit`;
+  const hook = await readOptional(join(root, path));
+  if (hook === undefined) problems.push(`${path} がない`);
+  else if (!/^\s*vp staged\b/m.test(hook)) problems.push(`${path} が vp staged を実行しない（整形結果をコミットに含める）`);
+  const stagedCommands = Object.values(config?.staged ?? {}).flat();
+  if (config && !stagedCommands.some((command) => /\bvp check --fix\b/.test(command))) {
+    problems.push(`templates/${t}/vite.config.ts の staged が vp check --fix を実行しない（整形結果をコミットに含める）`);
+  }
+  return problems;
+}
+
+async function loadFormatterConfig(root, t) {
+  const { file } = FORMATTER_CONFIGS[t];
+  try {
+    return { config: await loadConfig(join(root, `templates/${t}`, file)) };
+  } catch (error) {
+    if (error.code !== "ERR_MODULE_NOT_FOUND" || file !== "vite.config.ts") throw error;
+    return {
+      problem: `templates/${t}/${file} を読み込めない（ルートの vite.config.ts は vite-plus 以外を import しない。Vite のプラグインは apps/web/vite.config.ts に書く）`,
+    };
+  }
+}
+
 export async function check(root) {
   const problems = [];
 
@@ -127,7 +183,7 @@ export async function check(root) {
     if (pkg.engines?.node !== engine) {
       problems.push(`${pkgPath} の engines.node が ${engine} ではない（${pkg.engines?.node}）`);
     }
-    lefthookVersions[t] = pkg.devDependencies?.lefthook;
+    if (GIT_HOOKS[t] === "lefthook") lefthookVersions[t] = pkg.devDependencies?.lefthook;
   }
 
   if (new Set(Object.values(lefthookVersions)).size > 1) {
@@ -137,19 +193,21 @@ export async function check(root) {
     problems.push(`lefthook の版がテンプレート間でそろっていない（${list}）`);
   }
 
+  const formatterConfigs = {};
   for (const t of TEMPLATES) {
-    const config = await readOptional(join(root, `templates/${t}/lefthook.yml`));
-    if (config === undefined) problems.push(`templates/${t}/lefthook.yml がない`);
-    else if (/^\s+commands:/m.test(config)) problems.push(`templates/${t}/lefthook.yml が commands: を使っている（jobs: に統一する）`);
-    else if (!/^\s+stage_fixed:\s*true/m.test(config)) {
-      problems.push(`templates/${t}/lefthook.yml の pre-commit に stage_fixed: true がない（整形結果をコミットに含める）`);
-    }
-    if (await exists(join(root, `templates/${t}/.lefthook.yml`))) problems.push(`templates/${t}/.lefthook.yml は lefthook.yml に改名する`);
+    const { config, problem } = await loadFormatterConfig(root, t);
+    if (problem) problems.push(problem);
+    formatterConfigs[t] = config;
   }
 
   for (const t of TEMPLATES) {
+    problems.push(...(await (GIT_HOOKS[t] === "lefthook" ? checkLefthook(root, t) : checkVitePlusHooks(root, t, formatterConfigs[t]))));
+  }
+
+  for (const t of TEMPLATES) {
+    if (!formatterConfigs[t]) continue;
     const { file, read } = FORMATTER_CONFIGS[t];
-    const actual = read(await loadConfig(join(root, `templates/${t}`, file)));
+    const actual = read(formatterConfigs[t]);
     for (const [key, expected] of Object.entries(FORMAT)) {
       if (actual[key] !== expected) problems.push(`templates/${t}/${file} の${FORMAT_LABELS[key]}が ${expected} ではない（${actual[key]}）`);
     }

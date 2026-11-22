@@ -5,7 +5,7 @@
 ## リポジトリの構成
 
 ```
-.github/workflows/   ci.yml（テスト・秘密情報スキャン・3テンプレートの展開と lint / build）、release.yml（create-starter の公開）
+.github/workflows/   ci.yml（テスト・秘密情報スキャン・各テンプレートの展開と lint / test / build）、release.yml（create-starter の公開）
 packages/create-starter/   npm に公開する展開コマンド
 scripts/sync-shared.js     shared/ をテンプレートへ配る・ずれを検査する
 shared/                    全テンプレート共通の原本
@@ -28,7 +28,7 @@ templates/                 テンプレート本体（それぞれ単体のプ�
 
 > [!WARNING]
 > このリポジトリの中で、テンプレートのフォルダに `pnpm install` をしないでください。
-> `prepare` の `lefthook install` が、テンプレートではなくこのリポジトリの `.git` にフックを入れてしまいます（`LEFTHOOK=0` では止まりません）。
+> `prepare` の `lefthook install`（`webapp` は `vp config`）が、テンプレートではなくこのリポジトリの `.git` にフックを入れてしまいます（`LEFTHOOK=0` では止まりません）。
 > lockfile だけを更新するときは `pnpm install --lockfile-only` を使います。動作は、展開して確かめます。
 >
 > ```sh
@@ -37,7 +37,7 @@ templates/                 テンプレート本体（それぞれ単体のプ�
 
 ## テンプレートを足す
 
-1. `templates/<名前>/` を置き、`packages/create-starter/lib/templates.js` の `TEMPLATES` に足します（CI の matrix はここから作られます）
+1. `templates/<名前>/` を置き、`packages/create-starter/lib/templates.js` の `TEMPLATES` と `lib/prompt.js` の `PRESENTATION` に足します（CI の matrix は `TEMPLATES` から作られます）。`scripts/sync-shared.js` の `FORMATTER_CONFIGS` と `GIT_HOOKS` にも足します
 2. `scripts/sync-shared.js` の `RESET_CSS_PATHS` に reset.css の配り先を書きます（使わないなら `null`）
 3. `.github/dependabot.yml` の npm の `directories` に `/templates/<名前>` を足します
 4. `pnpm sync:shared && pnpm check:shared` を実行します
