@@ -114,12 +114,13 @@ export async function applyVariantManifest(dest) {
   await rm(path);
 }
 
-async function rewritePackageNameKeepingFormat(dest, name) {
-  const path = join(dest, "package.json");
+// JSON の "name": と TypeScript の name: の両方を扱うため、パースせずに最初の name の値だけを置き換えて書式を保つ
+async function rewriteNameKeepingFormat(dest, file, name) {
+  const path = join(dest, file);
   const source = await readFile(path, "utf8");
-  const renamed = source.replace(/("name"\s*:\s*)"[^"]*"/, `$1${JSON.stringify(name)}`);
-  if (JSON.parse(renamed).name !== name) throw new Error("package.json の name を書き換えられませんでした。");
-  await writeFile(path, renamed);
+  const pattern = /(\bname"?\s*:\s*)"[^"]*"/;
+  if (!pattern.test(source)) throw new Error(`${file} の name を書き換えられませんでした。`);
+  await writeFile(path, source.replace(pattern, `$1${JSON.stringify(name)}`));
 }
 
 async function postSetup({ template, css, dest, source, run, hasCommand, progress }) {
@@ -156,7 +157,7 @@ export async function create({ template, css, dir, ref, cwd, fetchTemplate, run,
   progress("テンプレートを取得しています");
   const { commit } = (await fetchTemplate({ template, css, ref, dest })) ?? {};
   await applyVariantManifest(dest);
-  await rewritePackageNameKeepingFormat(dest, name);
+  for (const file of TEMPLATES[template].nameFiles) await rewriteNameKeepingFormat(dest, file, name);
   const source = `参照元: ${REPO}@${ref}${commit ? ` (${commit})` : ""}`;
   const warnings = await postSetup({ template, css, dest, source, run, hasCommand, progress });
   return { warnings };
