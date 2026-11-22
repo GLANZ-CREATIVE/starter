@@ -187,11 +187,11 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.13.0(supports-color@10.2.2))
       '@wordpress/env':
-        specifier: ^11.17.0
-        version: 11.17.0(@types/node@26.6.2)(supports-color@10.2.2)
+        specifier: ^12.0.0
+        version: 12.0.0(@types/node@26.6.2)(supports-color@10.2.2)
       '@wordpress/scripts':
         specifier: ^36.1.0
-        version: 36.1.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@playwright/test@1.63.0)(@types/node@26.6.2)(@typescript-eslint/eslint-plugin@8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@wordpress/env@11.17.0(@types/node@26.6.2)(supports-color@10.2.2))(csso@5.0.5)(debug@4.4.3(supports-color@10.2.2))(lightningcss@1.33.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sharp@0.35.5(@types/node@26.6.2))(supports-color@10.2.2)(svgo@4.1.0)(type-fest@4.41.0)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.2)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 36.1.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@playwright/test@1.63.0)(@types/node@26.6.2)(@typescript-eslint/eslint-plugin@8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@wordpress/env@12.0.0(@types/node@26.6.2)(supports-color@10.2.2))(csso@5.0.5)(debug@4.4.3(supports-color@10.2.2))(lightningcss@1.33.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sharp@0.35.5(@types/node@26.6.2))(supports-color@10.2.2)(svgo@4.1.0)(type-fest@4.41.0)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.2)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))
       browserslist:
         specifier: ^4.29.5
         version: 4.29.5
@@ -2020,11 +2020,11 @@ packages:
     resolution: {integrity: sha512-PG3a+3GxurYYipLykRM3qezWjkIBYuqBjn8EuXzzlG6mpucMVtU8SRgr3EB0wdVaj1Pz+mhz+MLh8CGnLfKhCQ==}
     engines: {node: '>=18'}
 
-  '@simple-git/args-pathspec@1.0.3':
-    resolution: {integrity: sha512-ngJMaHlsWDTfjyq9F3VIQ8b7NXbBLq5j9i5bJ6XLYtD6qlDXT7fdKY2KscWWUF8t18xx052Y/PUO1K1TRc9yKA==}
+  '@simple-git/args-pathspec@1.0.4':
+    resolution: {integrity: sha512-EtMX6XjRWSastG2SdkmSQByPtJ9dx/NIjnHbpQPCYt62j4RmSx5rgLTGpw0YCjF5h191gZOmBfheOT23cRSFdw==}
 
-  '@simple-git/argv-parser@1.1.1':
-    resolution: {integrity: sha512-Q9lBcfQ+VQCpQqGJFHe5yooOS5hGdLFFbJ5R+R5aDsnkPCahtn1hSkMcORX65J2Z5lxSkD0lQorMsncuBQxYUw==}
+  '@simple-git/argv-parser@2.0.1':
+    resolution: {integrity: sha512-M++IaVWrN+vYalilOHfwvT2IL3wYZtVEBQpmX6DLSOJLtxbZ+SUeIDE3IiPogzhPACLajwtxfa5rp+ZX1FczzQ==}
 
   '@sindresorhus/base62@1.0.0':
     resolution: {integrity: sha512-TeheYy0ILzBEI/CO55CP6zJCSdSWeRtGnHy8U8dWSUH4I68iqTsy7HkMktR4xakThc9jotkPQUXT4ITdbV7cHA==}
@@ -2623,9 +2623,9 @@ packages:
       '@types/react-dom':
         optional: true
 
-  '@wordpress/env@11.17.0':
-    resolution: {integrity: sha512-2KQd7DMsDGIF3x2t8J9Se4A39O0m+8tAIaDYtB7A5kht4qAgr+8gpdPC7frNMEacH6YNPFJbQVtPOm+pmuIEIQ==}
-    engines: {node: '>=18.12.0'}
+  '@wordpress/env@12.0.0':
+    resolution: {integrity: sha512-RoUQV3sl1qF4h/kg+vrec9PCfr2bwXSOmWoLd9NmV8rD/sCBMt7tSBfeTWZEbClMhWHce8tu4hJ+pQeHXNnu2A==}
+    engines: {node: '>=22.13.0'}
     hasBin: true
 
   '@wordpress/escape-html@3.57.0':
@@ -6352,8 +6352,8 @@ packages:
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
 
-  simple-git@3.36.0:
-    resolution: {integrity: sha512-cGQjLjK8bxJw4QuYT7gxHw3/IouVESbhahSsHrX97MzCL1gu2u7oy38W6L2ZIGECEfIBG4BabsWDPjBxJENv9Q==}
+  simple-git@4.0.2:
+    resolution: {integrity: sha512-l0sIsv9VrPwovKELFDBOj/lhmIcbMvxBk2B+hRhsMM4/VL3gKtuZvYnBNixVo+N/0HnqQx2cBdLvxnAbygHpqA==}
 
   sirv@2.0.4:
     resolution: {integrity: sha512-94Bdh3cC2PKrbgSOUqTiGPWVZeSiXfKOVZNJniWoqrWrRkB1CJzBU3NEbiTsPcYy1lDsANA/THzS+9WBiy5nfQ==}
@@ -9206,11 +9206,11 @@ snapshots:
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
 
-  '@simple-git/args-pathspec@1.0.3': {}
+  '@simple-git/args-pathspec@1.0.4': {}
 
-  '@simple-git/argv-parser@1.1.1':
+  '@simple-git/argv-parser@2.0.1':
     dependencies:
-      '@simple-git/args-pathspec': 1.0.3
+      '@simple-git/args-pathspec': 1.0.4
 
   '@sindresorhus/base62@1.0.0': {}
 
@@ -9867,7 +9867,7 @@ snapshots:
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  '@wordpress/env@11.17.0(@types/node@26.6.2)(supports-color@10.2.2)':
+  '@wordpress/env@12.0.0(@types/node@26.6.2)(supports-color@10.2.2)':
     dependencies:
       '@inquirer/prompts': 7.10.1(@types/node@26.6.2)
       '@wp-playground/cli': 3.1.57(supports-color@10.2.2)
@@ -9880,7 +9880,7 @@ snapshots:
       js-yaml: 3.15.2
       ora: 4.1.1
       rimraf: 5.0.10
-      simple-git: 3.36.0(supports-color@10.2.2)
+      simple-git: 4.0.2(supports-color@10.2.2)
       yargs: 17.7.3
     transitivePeerDependencies:
       - '@types/node'
@@ -9970,7 +9970,7 @@ snapshots:
 
   '@wordpress/private-apis@2.0.0': {}
 
-  '@wordpress/scripts@36.1.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@playwright/test@1.63.0)(@types/node@26.6.2)(@typescript-eslint/eslint-plugin@8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@wordpress/env@11.17.0(@types/node@26.6.2)(supports-color@10.2.2))(csso@5.0.5)(debug@4.4.3(supports-color@10.2.2))(lightningcss@1.33.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sharp@0.35.5(@types/node@26.6.2))(supports-color@10.2.2)(svgo@4.1.0)(type-fest@4.41.0)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.2)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))':
+  '@wordpress/scripts@36.1.0(@opentelemetry/core@2.11.0(@opentelemetry/api@1.9.1))(@playwright/test@1.63.0)(@types/node@26.6.2)(@typescript-eslint/eslint-plugin@8.72.1(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@typescript-eslint/parser@8.72.1(eslint@10.13.0(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(@wordpress/env@12.0.0(@types/node@26.6.2)(supports-color@10.2.2))(csso@5.0.5)(debug@4.4.3(supports-color@10.2.2))(lightningcss@1.33.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sharp@0.35.5(@types/node@26.6.2))(supports-color@10.2.2)(svgo@4.1.0)(type-fest@4.41.0)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.2)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@10.2.2)
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.17(react-refresh@0.14.2)(type-fest@4.41.0)(webpack-dev-server@5.2.6)(webpack@5.111.1)
@@ -10025,7 +10025,7 @@ snapshots:
       webpack-dev-server: 5.2.6(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)(webpack-cli@5.1.4)(webpack@5.111.1)
     optionalDependencies:
       '@playwright/test': 1.63.0
-      '@wordpress/env': 11.17.0(@types/node@26.6.2)(supports-color@10.2.2)
+      '@wordpress/env': 12.0.0(@types/node@26.6.2)(supports-color@10.2.2)
       vite: 8.3.5(@types/node@26.6.2)(sass@1.105.0)(terser@5.51.2)(yaml@2.9.1)
     transitivePeerDependencies:
       - '@minify-html/node'
@@ -14154,12 +14154,12 @@ snapshots:
       once: 1.4.0
       simple-concat: 1.0.1
 
-  simple-git@3.36.0(supports-color@10.2.2):
+  simple-git@4.0.2(supports-color@10.2.2):
     dependencies:
       '@kwsites/file-exists': 1.1.1(supports-color@10.2.2)
       '@kwsites/promise-deferred': 1.1.1
-      '@simple-git/args-pathspec': 1.0.3
-      '@simple-git/argv-parser': 1.1.1
+      '@simple-git/args-pathspec': 1.0.4
+      '@simple-git/argv-parser': 2.0.1
       debug: 4.4.3(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
