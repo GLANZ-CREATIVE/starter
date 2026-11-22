@@ -58,22 +58,15 @@ const FORMATTER_CONFIGS = {
 
 const GIT_HOOKS = { wordpress: "lefthook", vite: "lefthook", astro: "lefthook", webapp: "vite-plus" };
 
-// このリポジトリにはテンプレートの依存を入れないので、vite.config.ts が import する vite-plus を素通しの defineConfig に差し替えて読む
-let vitePlusStubbed = false;
-function stubVitePlus() {
-  if (vitePlusStubbed) return;
-  registerHooks({
-    resolve: (specifier, context, nextResolve) =>
-      specifier === "vite-plus"
-        ? { url: "data:text/javascript,export const defineConfig = (config) => config;", shortCircuit: true }
-        : nextResolve(specifier, context),
-  });
-  vitePlusStubbed = true;
-}
+const VITE_PLUS_WITHOUT_INSTALL = "data:text/javascript,export const defineConfig = (config) => config;";
+
+registerHooks({
+  resolve: (specifier, context, nextResolve) =>
+    specifier === "vite-plus" ? { url: VITE_PLUS_WITHOUT_INSTALL, shortCircuit: true } : nextResolve(specifier, context),
+});
 
 async function loadConfig(path) {
   if (path.endsWith(".json")) return JSON.parse(await readFile(path, "utf8"));
-  if (path.endsWith(".ts")) stubVitePlus();
   return (await import(`${pathToFileURL(path).href}?t=${Date.now()}`)).default;
 }
 
