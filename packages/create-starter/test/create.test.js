@@ -111,6 +111,14 @@ describe("create", () => {
     assert.equal(await readFile(join(cwd, "my-site/.editorconfig"), "utf8"), "root = true\n");
   });
 
+  test("Cloudflare の Worker 名も案件名に置き換える（案件どうしでデプロイ先がぶつからない）", async () => {
+    await createSite("webapp");
+    assert.equal(
+      await readFile(join(cwd, "my-site/apps/web/cloudflare.config.ts"), "utf8"),
+      'import { defineConfig } from "cf/config";\n\nexport default defineConfig({\n  worker: {\n    name: "my-site",\n    compatibilityDate: "2026-11-17",\n  },\n});\n',
+    );
+  });
+
   test("Tailwind CSS を選ぶと、差分を重ね、差分の指示どおりに不要なファイルを消す", async () => {
     await createSite("vite", "tailwind");
     const site = join(cwd, "my-site");

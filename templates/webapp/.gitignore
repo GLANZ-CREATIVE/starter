@@ -22,4 +22,7 @@ Thumbs.db
 # ---- template specific ----
 dist
 *.local
+.cloudflare
+.dev.vars*
+!.dev.vars.example
 .vite-hooks/_

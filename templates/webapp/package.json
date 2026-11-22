@@ -9,6 +9,7 @@
     "test": "vp test",
     "lint": "vp check",
     "fix": "vp check --fix",
+    "deploy": "vp run @repo/web#deploy",
     "prepare": "vp config"
   },
   "devDependencies": {

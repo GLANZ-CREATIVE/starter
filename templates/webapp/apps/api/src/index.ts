@@ -1,9 +1,4 @@
-import { serve } from "@hono/node-server";
-
 import app from "./app.ts";
 
-const port = Number(process.env.PORT ?? 8787);
-
-serve({ fetch: app.fetch, port }, (info) => {
-  console.log(`API: http://localhost:${info.port}/api`);
-});
+// Cloudflare Workers の入口。バインディングなど環境ごとの処理はここに置き、app.ts を実行環境に依存させない
+export default app;

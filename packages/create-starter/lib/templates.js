@@ -1,8 +1,9 @@
+// nameFiles: 最初の name を案件名に置き換えるファイル
 export const TEMPLATES = {
-  wordpress: { commands: ["pnpm start"], footnote: "Docker を起動してから実行してください。" },
-  vite: { commands: ["pnpm dev"] },
-  astro: { commands: ["pnpm dev"] },
-  webapp: { commands: ["pnpm dev"] },
+  wordpress: { commands: ["pnpm start"], footnote: "Docker を起動してから実行してください。", nameFiles: ["package.json"] },
+  vite: { commands: ["pnpm dev"], nameFiles: ["package.json"] },
+  astro: { commands: ["pnpm dev"], nameFiles: ["package.json"] },
+  webapp: { commands: ["pnpm dev"], nameFiles: ["package.json", "apps/web/cloudflare.config.ts"] },
 };
 
 export const TEMPLATE_NAMES = Object.keys(TEMPLATES);

@@ -1,6 +1,6 @@
 {
   "name": "@glanz-creative/create-starter",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "GLANZ CREATIVE のサイト制作用ひな形（wordpress / vite / astro / webapp）を手元に展開する",
   "license": "MIT",
   "type": "module",
