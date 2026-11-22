@@ -18,9 +18,10 @@ export const CSS_METHOD_NAMES = Object.keys(CSS_METHODS);
 // 差分のフォルダに置く指示書。remove は共通部分から消すファイル、extends は共通部分の行をすべて含むべきファイル
 export const VARIANT_MANIFEST = ".variant.json";
 
+export const USAGE = `pnpm create @glanz-creative/starter <テンプレート名> <プロジェクト名> --css <${CSS_METHOD_NAMES.join(" / ")}> [--ref <タグかブランチ>]
+テンプレート名: ${TEMPLATE_NAMES.join(" / ")}`;
+
 export function formatNextSteps(template, dir) {
   const { commands, footnote } = TEMPLATES[template];
-  const lines = [`cd ${dir}`, ...commands];
-  if (footnote) lines.push("", footnote);
-  return lines.join("\n");
+  return [`cd ${dir}`, ...commands, "", ...(footnote ? [footnote] : []), "CSS の書き方は docs/css.md にあります。"].join("\n");
 }

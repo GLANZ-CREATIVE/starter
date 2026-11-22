@@ -4,10 +4,7 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 
 import { invalidPackageNameReason } from "./create.js";
-import { CSS_METHOD_NAMES, CSS_METHODS, TEMPLATE_NAMES, TEMPLATES } from "./templates.js";
-
-const USAGE = `使い方: pnpm create @glanz-creative/starter <テンプレート名> <プロジェクト名> --css <${CSS_METHOD_NAMES.join(" / ")}> [--ref <タグかブランチ>]
-テンプレート名: ${TEMPLATE_NAMES.join(" / ")}`;
+import { CSS_METHOD_NAMES, CSS_METHODS, TEMPLATE_NAMES, TEMPLATES, USAGE } from "./templates.js";
 
 function paint(hex) {
   if (!pc.isColorSupported) return (text) => text;
@@ -81,7 +78,11 @@ const clack = {
 
 export async function ask({ template, dir, css, isTTY, prompts = clack }) {
   if (TEMPLATES[template] && dir && CSS_METHODS[css]) return { template, dir, css };
-  if (!isTTY) throw new Error(`引数が足りません。\n${USAGE}`);
+  if (!isTTY) {
+    // 値の誤りは、展開前の検証が「〇〇はありません。選べるのは…」と具体的に伝える
+    if (template && dir && css) return { template, dir, css };
+    throw new Error(`引数が足りません。\n使い方: ${USAGE}`);
+  }
 
   const known = Boolean(TEMPLATES[template]);
   // 未指定のときは create-vite と同じく名前から聞く。渡されたテンプレート名が不正なときだけ先に選び直す。

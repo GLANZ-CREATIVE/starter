@@ -10,23 +10,29 @@ const FIXTURE_ROOT = new URL("./fixtures", import.meta.url).pathname;
 
 describe("parseCliArgs", () => {
   test("テンプレート名とフォルダ名を受け取る", () => {
-    assert.deepEqual(parseCliArgs(["vite", "my-site"]), { template: "vite", dir: "my-site", css: undefined, ref: "main" });
+    assert.deepEqual(parseCliArgs(["vite", "my-site"]), { template: "vite", dir: "my-site", css: undefined, ref: "main", help: false });
   });
 
   test("--ref でタグやブランチを指定できる", () => {
-    assert.deepEqual(parseCliArgs(["--ref", "v1.0.0", "astro", "site"]), { template: "astro", dir: "site", css: undefined, ref: "v1.0.0" });
+    assert.deepEqual(parseCliArgs(["--ref", "v1.0.0", "astro", "site"]), { template: "astro", dir: "site", css: undefined, ref: "v1.0.0", help: false });
   });
 
   test("--css で CSS の方式を指定できる", () => {
-    assert.deepEqual(parseCliArgs(["vite", "site", "--css", "tailwind"]), { template: "vite", dir: "site", css: "tailwind", ref: "main" });
+    assert.deepEqual(parseCliArgs(["vite", "site", "--css", "tailwind"]), { template: "vite", dir: "site", css: "tailwind", ref: "main", help: false });
   });
 
   test("足りない引数は undefined のまま返す（あとで対話で聞く）", () => {
-    assert.deepEqual(parseCliArgs([]), { template: undefined, dir: undefined, css: undefined, ref: "main" });
+    assert.deepEqual(parseCliArgs([]), { template: undefined, dir: undefined, css: undefined, ref: "main", help: false });
   });
 
-  test("知らないオプションはエラーにする", () => {
-    assert.throws(() => parseCliArgs(["--foo", "vite", "x"]));
+  test("知らないオプションは、日本語のエラーと使い方を出す", () => {
+    assert.throws(() => parseCliArgs(["--foo", "vite", "x"]), /オプション「--foo」はありません。\n使い方:/);
+  });
+
+  test("--help と -h を受け取る", () => {
+    assert.equal(parseCliArgs(["--help"]).help, true);
+    assert.equal(parseCliArgs(["-h"]).help, true);
+    assert.equal(parseCliArgs(["vite", "x"]).help, false);
   });
 });
 

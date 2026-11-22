@@ -2,7 +2,7 @@ import { cp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
-import { CSS_METHOD_NAMES, CSS_METHODS, TEMPLATE_NAMES, TEMPLATES, VARIANT_MANIFEST } from "./templates.js";
+import { CSS_METHOD_NAMES, CSS_METHODS, TEMPLATE_NAMES, TEMPLATES, USAGE, VARIANT_MANIFEST } from "./templates.js";
 
 const REPO = "GLANZ-CREATIVE/starter";
 const PACKAGE_NAME = /^[a-z0-9][a-z0-9._-]*$/;
@@ -14,14 +14,26 @@ export function invalidPackageNameReason(name) {
 }
 
 export function parseCliArgs(argv) {
-  const { values, positionals } = parseArgs({
-    args: argv,
-    options: { ref: { type: "string", default: "main" }, css: { type: "string" } },
-    allowPositionals: true,
-    strict: true,
-  });
+  let parsed;
+  try {
+    parsed = parseArgs({
+      args: argv,
+      options: {
+        ref: { type: "string", default: "main" },
+        css: { type: "string" },
+        help: { type: "boolean", short: "h", default: false },
+      },
+      allowPositionals: true,
+      strict: true,
+    });
+  } catch (error) {
+    if (error.code !== "ERR_PARSE_ARGS_UNKNOWN_OPTION") throw error;
+    const option = error.message.match(/'([^']+)'/)?.[1] ?? "";
+    throw new Error(`オプション「${option}」はありません。\n使い方: ${USAGE}`);
+  }
+  const { values, positionals } = parsed;
   const [template, dir] = positionals;
-  return { template, dir, css: values.css, ref: values.ref };
+  return { template, dir, css: values.css, ref: values.ref, help: values.help };
 }
 
 async function isEmptyOrMissing(path) {
