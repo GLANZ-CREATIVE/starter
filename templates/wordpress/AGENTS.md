@@ -17,6 +17,10 @@ WordPress テーマ制作用のテンプレート。Vite でアセットをビ�
 - `theme/dist/` ビルド出力（Git 管理外）
 - `theme/blocks/` カスタムブロック（`@wordpress/scripts`）。`theme/functions/blocks.php` が `build/*/block.json` を走査して自動登録する
 
+## CSS
+
+- `docs/css.md` に従う
+
 ## 規約
 
 - コメントは「why」「why not」のみ。意図的負債は `FIXME` + 理由

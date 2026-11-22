@@ -1,0 +1,36 @@
+@theme {
+  --font-base: arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  --color-white: #fff;
+  --color-black: #000;
+  --color-ring: #2563eb;
+}
+
+/* レイヤーの外に書くとユーティリティより優先され、要素にクラスを付けても効かなくなる */
+@layer base {
+  html {
+    overflow-x: clip;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.8;
+    color: var(--color-black);
+    letter-spacing: 0.05em;
+    background: var(--color-white);
+  }
+
+  /* preflight は cursor: default にする */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--color-ring);
+    outline-offset: 1px;
+  }
+}

@@ -16,5 +16,5 @@ export default {
       customSyntax: "postcss-html",
     },
   ],
-  ignoreFiles: ["dist/**", ".astro/**", "node_modules/**", "src/styles/kiso.css"],
+  ignoreFiles: ["dist/**", ".astro/**", "node_modules/**", "src/styles/reset.css"],
 };

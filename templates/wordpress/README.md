@@ -79,12 +79,9 @@ pnpm import:db ./sql/backup-XXXX.sql  # リストア
 > [!NOTE]
 > 詳細は [functions/vite.php](theme/functions/vite.php) と [functions/assets.php](theme/functions/assets.php) を参照してください。
 
-## CSS 拡張
+## CSS
 
-必要に応じて導入する手順は `docs/` にあります。
-
-- [Tailwind CSS を導入する](docs/tailwind.md)
-- [Sass を導入する](docs/sass.md)
+CSS の方式（Vanilla CSS / Tailwind CSS）は、作成時に create-starter で選んだものです。書き方は [docs/css.md](docs/css.md) にまとめています。
 
 ## カスタムブロック
 
@@ -163,7 +160,7 @@ pnpm wp-env start --update
 ├── mu-plugins/
 ├── sql/                    # DB バックアップ
 ├── uploads/
-├── docs/                   # 必要に応じて導入する手順（Tailwind CSS / Sass など）
+├── docs/                   # CSS の書き方など
 ├── .wp-env.json            # wp-env 設定（開発専用）
 ├── docker-compose.mailpit.yml
 └── vite.config.js

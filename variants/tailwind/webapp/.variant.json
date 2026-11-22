@@ -1,0 +1,9 @@
+{
+  "remove": [
+    "apps/web/src/styles/reset.css"
+  ],
+  "extends": [
+    "pnpm-workspace.yaml",
+    "apps/web/package.json"
+  ]
+}

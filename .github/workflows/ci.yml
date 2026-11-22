@@ -38,23 +38,30 @@ jobs:
         run: gitleaks git --redact --verbose .
 
   list-templates:
-    name: テンプレート名の一覧
+    name: テンプレート名と CSS の方式の一覧
     runs-on: ubuntu-latest
     outputs:
       names: ${{ steps.list.outputs.names }}
+      css: ${{ steps.list.outputs.css }}
     steps:
       - uses: actions/checkout@v7
       - id: list
-        run: node --input-type=module -e 'import { TEMPLATE_NAMES } from "./packages/create-starter/lib/templates.js"; console.log(`names=${JSON.stringify(TEMPLATE_NAMES)}`)' >> "$GITHUB_OUTPUT"
+        run: |
+          node --input-type=module -e '
+            import { CSS_METHOD_NAMES, TEMPLATE_NAMES } from "./packages/create-starter/lib/templates.js";
+            console.log(`names=${JSON.stringify(TEMPLATE_NAMES)}`);
+            console.log(`css=${JSON.stringify(CSS_METHOD_NAMES)}`);
+          ' >> "$GITHUB_OUTPUT"
 
   templates:
-    name: ${{ matrix.template }} を展開して lint / build
+    name: ${{ matrix.template }}（${{ matrix.css }}）を展開して lint / build
     needs: list-templates
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         template: ${{ fromJSON(needs.list-templates.outputs.names) }}
+        css: ${{ fromJSON(needs.list-templates.outputs.css) }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -69,7 +76,7 @@ jobs:
         run: |
           git config --global user.name "ci"
           git config --global user.email "ci@example.com"
-          node starter/packages/create-starter/index.js ${{ matrix.template }} site
+          node starter/packages/create-starter/index.js ${{ matrix.template }} site --css ${{ matrix.css }}
         env:
           CREATE_STARTER_LOCAL_DIR: ${{ github.workspace }}/starter
       - name: Lint

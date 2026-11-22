@@ -1,8 +1,8 @@
-import { cp, readdir, readFile, writeFile } from "node:fs/promises";
+import { cp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 
-import { TEMPLATE_NAMES, TEMPLATES } from "./templates.js";
+import { CSS_METHOD_NAMES, CSS_METHODS, TEMPLATE_NAMES, TEMPLATES, VARIANT_MANIFEST } from "./templates.js";
 
 const REPO = "GLANZ-CREATIVE/starter";
 const PACKAGE_NAME = /^[a-z0-9][a-z0-9._-]*$/;
@@ -16,12 +16,12 @@ export function invalidPackageNameReason(name) {
 export function parseCliArgs(argv) {
   const { values, positionals } = parseArgs({
     args: argv,
-    options: { ref: { type: "string", default: "main" } },
+    options: { ref: { type: "string", default: "main" }, css: { type: "string" } },
     allowPositionals: true,
     strict: true,
   });
   const [template, dir] = positionals;
-  return { template, dir, ref: values.ref };
+  return { template, dir, css: values.css, ref: values.ref };
 }
 
 async function isEmptyOrMissing(path) {
@@ -33,9 +33,12 @@ async function isEmptyOrMissing(path) {
   }
 }
 
-export async function validate({ template, dir, cwd }) {
+export async function validate({ template, css, dir, cwd }) {
   if (!TEMPLATES[template]) {
     throw new Error(`テンプレート「${template}」はありません。選べるのは ${TEMPLATE_NAMES.join(", ")} です。`);
+  }
+  if (!CSS_METHODS[css]) {
+    throw new Error(`CSS の方式「${css}」はありません。選べるのは ${CSS_METHOD_NAMES.join(", ")} です。`);
   }
   const reason = invalidPackageNameReason(basename(resolve(cwd, dir)));
   if (reason) throw new Error(reason);
@@ -58,22 +61,45 @@ async function resolveCommit(ref) {
   }
 }
 
+// 共通部分の上に、CSS の方式ごとの差分を重ねる順に並べる
+function sourceDirs(template, css) {
+  const { overlay } = CSS_METHODS[css];
+  return [`templates/${template}`, ...(overlay ? [`${overlay}/${template}`] : [])];
+}
+
 export function fromGitHub() {
-  return async ({ template, ref, dest }) => {
+  return async ({ template, css, ref, dest }) => {
     const { downloadTemplate } = await import("giget");
     const commit = await resolveCommit(ref);
-    await downloadTemplate(`gh:${REPO}/templates/${template}#${commit ?? ref}`, { dir: dest, force: true, registry: false });
+    for (const dir of sourceDirs(template, css)) {
+      await downloadTemplate(`gh:${REPO}/${dir}#${commit ?? ref}`, { dir: dest, force: true, registry: false });
+    }
     return { commit };
   };
 }
 
 export function fromLocalDir(root) {
-  return async ({ template, dest }) => {
-    await cp(join(root, "templates", template), dest, {
-      recursive: true,
-      filter: (source) => !source.split(/[\\/]/).includes("node_modules"),
-    });
+  return async ({ template, css, dest }) => {
+    for (const dir of sourceDirs(template, css)) {
+      await cp(join(root, dir), dest, {
+        recursive: true,
+        filter: (source) => !source.split(/[\\/]/).includes("node_modules"),
+      });
+    }
   };
+}
+
+export async function applyVariantManifest(dest) {
+  const path = join(dest, VARIANT_MANIFEST);
+  let manifest;
+  try {
+    manifest = JSON.parse(await readFile(path, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  for (const file of manifest.remove ?? []) await rm(join(dest, file), { recursive: true, force: true });
+  await rm(path);
 }
 
 async function rewritePackageNameKeepingFormat(dest, name) {
@@ -84,7 +110,7 @@ async function rewritePackageNameKeepingFormat(dest, name) {
   await writeFile(path, renamed);
 }
 
-async function postSetup({ template, dest, source, run, hasCommand, progress }) {
+async function postSetup({ template, css, dest, source, run, hasCommand, progress }) {
   const options = { cwd: dest };
   const warnings = [];
   await run("git", ["init", "-b", "main"], options);
@@ -100,24 +126,26 @@ async function postSetup({ template, dest, source, run, hasCommand, progress }) 
     await run("pnpm", ["install", "--frozen-lockfile"], options);
   }
 
-  await commitPristineTemplate({ template, source, run, options });
+  await commitPristineTemplate({ template, css, source, run, options });
   return warnings;
 }
 
-async function commitPristineTemplate({ template, source, run, options }) {
+async function commitPristineTemplate({ template, css, source, run, options }) {
+  const subject = `chore: @glanz-creative/starter の ${template} テンプレート（${CSS_METHODS[css].title}）から作成`;
   await run("git", ["add", "-A"], options);
-  await run("git", ["commit", "--no-verify", "-m", `chore: @glanz-creative/starter の ${template} テンプレートから作成`, "-m", source], options);
+  await run("git", ["commit", "--no-verify", "-m", subject, "-m", source], options);
 }
 
-export async function create({ template, dir, ref, cwd, fetchTemplate, run, hasCommand, progress = () => {} }) {
-  await validate({ template, dir, cwd });
+export async function create({ template, css, dir, ref, cwd, fetchTemplate, run, hasCommand, progress = () => {} }) {
+  await validate({ template, css, dir, cwd });
   const dest = resolve(cwd, dir);
   const name = basename(dest);
 
   progress("テンプレートを取得しています");
-  const { commit } = (await fetchTemplate({ template, ref, dest })) ?? {};
+  const { commit } = (await fetchTemplate({ template, css, ref, dest })) ?? {};
+  await applyVariantManifest(dest);
   await rewritePackageNameKeepingFormat(dest, name);
   const source = `参照元: ${REPO}@${ref}${commit ? ` (${commit})` : ""}`;
-  const warnings = await postSetup({ template, dest, source, run, hasCommand, progress });
+  const warnings = await postSetup({ template, css, dest, source, run, hasCommand, progress });
   return { warnings };
 }

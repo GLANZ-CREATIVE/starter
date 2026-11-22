@@ -1,0 +1,8 @@
+{
+  "remove": [
+    "src/assets/css/base/reset.css"
+  ],
+  "extends": [
+    "package.json"
+  ]
+}

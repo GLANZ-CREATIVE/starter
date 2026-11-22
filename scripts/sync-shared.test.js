@@ -51,11 +51,6 @@ describe("sync と check", () => {
     assert.deepEqual(await check(root), []);
   });
 
-  test("reset.css は astro に配らない", async () => {
-    await sync(root);
-    await assert.rejects(readFile(join(root, "templates/astro/src/assets/css/base/reset.css")));
-  });
-
   test("テンプレートの共通ファイルを書き換えると報告する", async () => {
     await sync(root);
     await writeFile(join(root, "templates/vite/.editorconfig"), "changed\n");
@@ -67,8 +62,11 @@ describe("sync と check", () => {
     const path = join(root, "templates/astro/package.json");
     const pkg = JSON.parse(await readFile(path, "utf8"));
     pkg.packageManager = "pnpm@10.0.0";
-    await writeFile(path, JSON.stringify(pkg));
-    assert.deepEqual(await check(root), ["templates/astro/package.json の packageManager が pnpm@12.12.1 ではない（pnpm@10.0.0）"]);
+    await writeFile(path, JSON.stringify(pkg, null, 2));
+    assert.deepEqual(await check(root), [
+      "templates/astro/package.json の packageManager が pnpm@12.12.1 ではない（pnpm@10.0.0）",
+      'variants/tailwind/astro/package.json に templates/astro/package.json の「"packageManager": "pnpm@10.0.0"」が入っていない',
+    ]);
   });
 
   test("engines.node が Node のメジャー版とそろっていないと報告する", async () => {
@@ -76,8 +74,11 @@ describe("sync と check", () => {
     const path = join(root, "templates/astro/package.json");
     const pkg = JSON.parse(await readFile(path, "utf8"));
     pkg.engines.node = ">=22.12.0";
-    await writeFile(path, JSON.stringify(pkg));
-    assert.deepEqual(await check(root), ["templates/astro/package.json の engines.node が >=24 ではない（>=22.12.0）"]);
+    await writeFile(path, JSON.stringify(pkg, null, 2));
+    assert.deepEqual(await check(root), [
+      "templates/astro/package.json の engines.node が >=24 ではない（>=22.12.0）",
+      'variants/tailwind/astro/package.json に templates/astro/package.json の「"node": ">=22.12.0"」が入っていない',
+    ]);
   });
 
   test("lefthook の版がテンプレート間でそろっていないと報告する", async () => {
@@ -85,8 +86,11 @@ describe("sync と check", () => {
     const path = join(root, "templates/vite/package.json");
     const pkg = JSON.parse(await readFile(path, "utf8"));
     pkg.devDependencies.lefthook = "^2.0.0";
-    await writeFile(path, JSON.stringify(pkg));
-    assert.deepEqual(await check(root), ["lefthook の版がテンプレート間でそろっていない（wordpress: ^2.2.1, vite: ^2.0.0, astro: ^2.2.1）"]);
+    await writeFile(path, JSON.stringify(pkg, null, 2));
+    assert.deepEqual(await check(root), [
+      "lefthook の版がテンプレート間でそろっていない（wordpress: ^2.2.1, vite: ^2.0.0, astro: ^2.2.1）",
+      'variants/tailwind/vite/package.json に templates/vite/package.json の「"lefthook": "^2.0.0"」が入っていない',
+    ]);
   });
 
   test("templates/ にあって TEMPLATES にないフォルダを報告する", async () => {
@@ -161,6 +165,52 @@ describe("sync と check", () => {
     assert.deepEqual(await check(root), [
       "templates/vite/lefthook.yml がない",
       "templates/astro/lefthook.yml が commands: を使っている（jobs: に統一する）",
+    ]);
+  });
+
+  test("差分のファイルが、共通部分に足された行を含んでいないと報告する", async () => {
+    await sync(root);
+    const path = join(root, "templates/vite/package.json");
+    const pkg = JSON.parse(await readFile(path, "utf8"));
+    await writeFile(path, JSON.stringify({ ...pkg, private: true }, null, 2));
+    assert.deepEqual(await check(root), ['variants/tailwind/vite/package.json に templates/vite/package.json の「"private": true」が入っていない']);
+  });
+
+  test("差分の package.json を extends に入れていないと報告する", async () => {
+    await sync(root);
+    const manifest = join(root, "variants/tailwind/vite/.variant.json");
+    await writeFile(manifest, JSON.stringify({ remove: ["src/assets/css/base/reset.css"], extends: [] }));
+    assert.deepEqual(await check(root), ["variants/tailwind/vite/.variant.json の extends に package.json がない（共通部分の変更を取り込めているか検査できない）"]);
+  });
+
+  test("差分が reset.css を消していないと報告する", async () => {
+    await sync(root);
+    await writeFile(join(root, "variants/tailwind/astro/.variant.json"), JSON.stringify({ remove: [], extends: ["package.json"] }));
+    assert.deepEqual(await check(root), ["variants/tailwind/astro/.variant.json の remove に src/styles/reset.css がない（tailwind では reset.css を配らない）"]);
+  });
+
+  test("共通部分にないファイルを消そうとしていると報告する", async () => {
+    await sync(root);
+    await writeFile(
+      join(root, "variants/tailwind/astro/.variant.json"),
+      JSON.stringify({ remove: ["src/styles/reset.css", "src/styles/kiso.css"], extends: ["package.json"] }),
+    );
+    assert.deepEqual(await check(root), ["variants/tailwind/astro/.variant.json の remove にある src/styles/kiso.css が templates/astro にない"]);
+  });
+
+  test("shared/ から配るファイルを差分に置くと報告する", async () => {
+    await sync(root);
+    await writeFile(join(root, "variants/tailwind/vite/.editorconfig"), "root = true\n");
+    assert.deepEqual(await check(root), ["variants/tailwind/vite/.editorconfig は shared/ から配るファイルなので差分に置かない"]);
+  });
+
+  test("差分の指示書がない、または TEMPLATES にない差分のフォルダを報告する", async () => {
+    await sync(root);
+    await rm(join(root, "variants/tailwind/webapp/.variant.json"));
+    await mkdir(join(root, "variants/tailwind/laravel"));
+    assert.deepEqual(await check(root), [
+      "variants/tailwind/webapp/.variant.json がない",
+      "variants/tailwind/laravel が create-starter の TEMPLATES にない",
     ]);
   });
 });

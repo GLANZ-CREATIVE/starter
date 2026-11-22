@@ -1,0 +1,15 @@
+@theme {
+  --font-sans: system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --color-bg: #fff;
+  --color-text: #111;
+  --color-accent: #2563eb;
+}
+
+/* レイヤーの外に書くとユーティリティより優先され、要素にクラスを付けても効かなくなる */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "remove": [
+    "theme/src/assets/css/base/reset.css",
+    "docs/sass.md"
+  ],
+  "extends": [
+    "package.json",
+    "vite.config.js",
+    ".stylelintrc.json"
+  ]
+}

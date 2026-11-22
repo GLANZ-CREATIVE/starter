@@ -1,0 +1,12 @@
+{
+  "remove": [
+    "src/assets/css/base/reset.css",
+    "src/assets/css/base/breakpoint.css",
+    "docs/sass.md"
+  ],
+  "extends": [
+    "package.json",
+    "vite.config.js",
+    "biome.json"
+  ]
+}

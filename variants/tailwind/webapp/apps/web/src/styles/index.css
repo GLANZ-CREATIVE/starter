@@ -1,0 +1,4 @@
+@import "tailwindcss";
+/* 既定では apps/web だけを走査するため、部品のクラスも拾えるよう packages/ui を足す */
+@source "../../../../packages/ui/src";
+@import "./theme.css";

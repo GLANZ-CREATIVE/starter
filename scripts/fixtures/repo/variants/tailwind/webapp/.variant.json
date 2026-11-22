@@ -1,0 +1,8 @@
+{
+  "remove": [
+    "apps/web/src/styles/reset.css"
+  ],
+  "extends": [
+    "package.json"
+  ]
+}
