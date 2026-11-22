@@ -110,7 +110,7 @@ describe("sync と check", () => {
     );
     await writeFile(
       join(root, "templates/webapp/vite.config.ts"),
-      'import { defineConfig } from "vite-plus";\n\nexport default defineConfig({ fmt: { singleQuote: true } });\n',
+      'import { defineConfig } from "vite-plus";\n\nexport default defineConfig({ staged: { "*": "vp check --fix" }, fmt: { singleQuote: true } });\n',
     );
     assert.deepEqual(await check(root), [
       "templates/vite/biome.json の引用符が double ではない（single）",
@@ -129,6 +129,23 @@ describe("sync と check", () => {
     assert.deepEqual(await check(root), ["templates/webapp/.vite-hooks/pre-commit が vp staged を実行しない（整形結果をコミットに含める）"]);
     await rm(hook);
     assert.deepEqual(await check(root), ["templates/webapp/.vite-hooks/pre-commit がない"]);
+  });
+
+  test("vite.config.ts の staged が vp check --fix を実行しないと報告する", async () => {
+    await sync(root);
+    await writeFile(join(root, "templates/webapp/vite.config.ts"), 'import { defineConfig } from "vite-plus";\n\nexport default defineConfig({ fmt: { printWidth: 150 } });\n');
+    assert.deepEqual(await check(root), ["templates/webapp/vite.config.ts の staged が vp check --fix を実行しない（整形結果をコミットに含める）"]);
+  });
+
+  test("ルートの vite.config.ts が vite-plus 以外を import すると、読めない理由を報告する", async () => {
+    await sync(root);
+    await writeFile(
+      join(root, "templates/webapp/vite.config.ts"),
+      'import react from "@vitejs/plugin-react";\nimport { defineConfig } from "vite-plus";\n\nexport default defineConfig({ plugins: [react()] });\n',
+    );
+    assert.deepEqual(await check(root), [
+      "templates/webapp/vite.config.ts を読み込めない（ルートの vite.config.ts は vite-plus 以外を import しない。Vite のプラグインは apps/web/vite.config.ts に書く）",
+    ]);
   });
 
   test("pre-commit が整形結果をコミットに含めない（stage_fixed がない）と報告する", async () => {

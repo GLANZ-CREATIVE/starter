@@ -30,7 +30,7 @@ export function App() {
       <form onSubmit={handleSubmit} noValidate>
         <label>
           名前
-          <input name="name" aria-invalid={error !== ""} aria-describedby="name-error" />
+          <input name="name" aria-invalid={error !== ""} aria-describedby={error ? "name-error" : undefined} />
         </label>
         <Button type="submit">送信</Button>
         <p id="name-error" role="alert">
