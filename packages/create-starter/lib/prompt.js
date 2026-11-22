@@ -4,9 +4,9 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 
 import { invalidPackageNameReason } from "./create.js";
-import { TEMPLATE_NAMES, TEMPLATES } from "./templates.js";
+import { CSS_METHOD_NAMES, CSS_METHODS, TEMPLATE_NAMES, TEMPLATES } from "./templates.js";
 
-const USAGE = `使い方: pnpm create @glanz-creative/starter <テンプレート名> <プロジェクト名> [--ref <タグかブランチ>]
+const USAGE = `使い方: pnpm create @glanz-creative/starter <テンプレート名> <プロジェクト名> --css <${CSS_METHOD_NAMES.join(" / ")}> [--ref <タグかブランチ>]
 テンプレート名: ${TEMPLATE_NAMES.join(" / ")}`;
 
 function paint(hex) {
@@ -22,6 +22,11 @@ const PRESENTATION = {
   vite: { title: "Vite", hint: "HTML の静的サイト", color: paint("#646CFF") },
   astro: { title: "Astro", hint: "コンポーネントの静的サイト", color: paint("#FF5D01") },
   webapp: { title: "Web アプリ", hint: "React + Hono のモノレポ（Vite+）", color: paint("#61DAFB") },
+};
+
+const CSS_HINTS = {
+  vanilla: "reset.css と @layer で書く",
+  tailwind: "ユーティリティクラスで書く",
 };
 
 export class PromptCancelled extends Error {
@@ -40,6 +45,14 @@ function templateOptions() {
 
 function templateQuestion(template) {
   return template ? `「${template}」はありません。どのテンプレートで始めますか？` : "どのテンプレートで始めますか？";
+}
+
+function cssOptions() {
+  return CSS_METHOD_NAMES.map((name) => ({ value: name, label: `${CSS_METHODS[name].title}  ${pc.dim(CSS_HINTS[name])}` }));
+}
+
+function cssQuestion(css) {
+  return css ? `CSS の方式「${css}」はありません。どの方式で書きますか？` : "CSS はどの方式で書きますか？";
 }
 
 function nameQuestion() {
@@ -66,8 +79,8 @@ const clack = {
   isCancel: p.isCancel,
 };
 
-export async function ask({ template, dir, isTTY, prompts = clack }) {
-  if (TEMPLATES[template] && dir) return { template, dir };
+export async function ask({ template, dir, css, isTTY, prompts = clack }) {
+  if (TEMPLATES[template] && dir && CSS_METHODS[css]) return { template, dir, css };
   if (!isTTY) throw new Error(`引数が足りません。\n${USAGE}`);
 
   const known = Boolean(TEMPLATES[template]);
@@ -75,6 +88,7 @@ export async function ask({ template, dir, isTTY, prompts = clack }) {
   if (!dir && (!template || known)) dir = (await answer(await prompts.text(nameQuestion()), prompts)).trim();
   if (!known) template = await answer(await prompts.select({ message: templateQuestion(template), options: templateOptions() }), prompts);
   if (!dir) dir = (await answer(await prompts.text(nameQuestion()), prompts)).trim();
+  if (!CSS_METHODS[css]) css = await answer(await prompts.select({ message: cssQuestion(css), options: cssOptions() }), prompts);
 
-  return { template, dir };
+  return { template, dir, css };
 }

@@ -70,10 +70,7 @@ CSS の変換と圧縮には [lightningcss](https://lightningcss.dev/) を使用
 
 整形と静的解析は Biome が担当します。プロパティの並び替え（`useSortedProperties`）も有効なため、宣言順は自動で統一されます。
 
-> [!NOTE]
-> Sass（SCSS）は標準では含まれていません。  
-> Biome は `.scss` を処理しないため、導入すると整形と lint を担うツールがなくなり、Prettier と Stylelint の追加が必要になります。  
-> 代替可否の判断基準と移行手順は [docs/sass.md](docs/sass.md) にまとめています。
+CSS の方式（Vanilla CSS / Tailwind CSS）は、作成時に create-starter で選んだものです。書き方は [docs/css.md](docs/css.md) にまとめています。
 
 ## 画像最適化
 

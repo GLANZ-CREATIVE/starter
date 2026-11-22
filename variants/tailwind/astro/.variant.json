@@ -1,0 +1,11 @@
+{
+  "remove": [
+    "src/styles/reset.css",
+    "docs/sass.md"
+  ],
+  "extends": [
+    "package.json",
+    "astro.config.mjs",
+    "stylelint.config.mjs"
+  ]
+}

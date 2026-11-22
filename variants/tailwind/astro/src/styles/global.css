@@ -1,0 +1,3 @@
+/* source: 既定ではプロジェクト全体を走査し、docs/ の Markdown に書いたクラスまで出力するため src/ に限る */
+@import "tailwindcss" source("../");
+@import "./theme.css";

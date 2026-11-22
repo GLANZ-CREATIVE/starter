@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, test } from "node:test";
@@ -10,15 +10,19 @@ const FIXTURE_ROOT = new URL("./fixtures", import.meta.url).pathname;
 
 describe("parseCliArgs", () => {
   test("テンプレート名とフォルダ名を受け取る", () => {
-    assert.deepEqual(parseCliArgs(["vite", "my-site"]), { template: "vite", dir: "my-site", ref: "main" });
+    assert.deepEqual(parseCliArgs(["vite", "my-site"]), { template: "vite", dir: "my-site", css: undefined, ref: "main" });
   });
 
   test("--ref でタグやブランチを指定できる", () => {
-    assert.deepEqual(parseCliArgs(["--ref", "v1.0.0", "astro", "site"]), { template: "astro", dir: "site", ref: "v1.0.0" });
+    assert.deepEqual(parseCliArgs(["--ref", "v1.0.0", "astro", "site"]), { template: "astro", dir: "site", css: undefined, ref: "v1.0.0" });
+  });
+
+  test("--css で CSS の方式を指定できる", () => {
+    assert.deepEqual(parseCliArgs(["vite", "site", "--css", "tailwind"]), { template: "vite", dir: "site", css: "tailwind", ref: "main" });
   });
 
   test("足りない引数は undefined のまま返す（あとで対話で聞く）", () => {
-    assert.deepEqual(parseCliArgs([]), { template: undefined, dir: undefined, ref: "main" });
+    assert.deepEqual(parseCliArgs([]), { template: undefined, dir: undefined, css: undefined, ref: "main" });
   });
 
   test("知らないオプションはエラーにする", () => {
@@ -38,22 +42,26 @@ describe("validate", () => {
   });
 
   test("存在しないテンプレート名はエラーにし、選べる名前を示す", async () => {
-    await assert.rejects(validate({ template: "laravel", dir: "x", cwd }), /laravel.*wordpress, vite, astro/);
+    await assert.rejects(validate({ template: "laravel", css: "vanilla", dir: "x", cwd }), /laravel.*wordpress, vite, astro/);
+  });
+
+  test("存在しない CSS の方式はエラーにし、選べる方式を示す", async () => {
+    await assert.rejects(validate({ template: "vite", css: "sass", dir: "x", cwd }), /sass.*vanilla, tailwind/);
   });
 
   test("空でないフォルダはエラーにする", async () => {
     await mkdir(join(cwd, "site"));
     await writeFile(join(cwd, "site/index.html"), "");
-    await assert.rejects(validate({ template: "vite", dir: "site", cwd }), /空ではありません/);
+    await assert.rejects(validate({ template: "vite", css: "vanilla", dir: "site", cwd }), /空ではありません/);
   });
 
   test("空のフォルダなら通す", async () => {
     await mkdir(join(cwd, "site"));
-    await validate({ template: "vite", dir: "site", cwd });
+    await validate({ template: "vite", css: "vanilla", dir: "site", cwd });
   });
 
   test("package.json の name に使えないフォルダ名はエラーにする", async () => {
-    await assert.rejects(validate({ template: "vite", dir: "My Site", cwd }), /package\.json の name/);
+    await assert.rejects(validate({ template: "vite", css: "vanilla", dir: "My Site", cwd }), /package\.json の name/);
   });
 });
 
@@ -75,9 +83,10 @@ describe("create", () => {
     await rm(cwd, { recursive: true, force: true });
   });
 
-  const createSite = (template) =>
+  const createSite = (template, css = "vanilla") =>
     create({
       template,
+      css,
       dir: "my-site",
       ref: "main",
       cwd,
@@ -96,6 +105,28 @@ describe("create", () => {
     assert.equal(await readFile(join(cwd, "my-site/.editorconfig"), "utf8"), "root = true\n");
   });
 
+  test("Tailwind CSS を選ぶと、差分を重ね、差分の指示どおりに不要なファイルを消す", async () => {
+    await createSite("vite", "tailwind");
+    const site = join(cwd, "my-site");
+    assert.deepEqual(JSON.parse(await readFile(join(site, "package.json"), "utf8")).devDependencies, { tailwindcss: "^4.0.0" });
+    assert.equal(await readFile(join(site, "src/index.css"), "utf8"), '@import "tailwindcss";\n');
+    assert.equal(await readFile(join(site, ".editorconfig"), "utf8"), "root = true\n");
+    await assert.rejects(access(join(site, "src/reset.css")));
+    await assert.rejects(access(join(site, ".variant.json")));
+  });
+
+  test("Vanilla CSS では差分を重ねない", async () => {
+    await createSite("vite", "vanilla");
+    const site = join(cwd, "my-site");
+    await access(join(site, "src/reset.css"));
+    await assert.rejects(access(join(site, "src/index.css")));
+  });
+
+  test("最初のコミットのメッセージに CSS の方式を残す", async () => {
+    await createSite("vite", "tailwind");
+    assert.ok(commands.at(-1).startsWith("git commit --no-verify -m chore: @glanz-creative/starter の vite テンプレート（Tailwind CSS）から作成"));
+  });
+
   test("git init → mise → pnpm install → 最初のコミットの順に実行し、push はしない", async () => {
     await createSite("vite");
     assert.deepEqual(commands, [
@@ -104,13 +135,14 @@ describe("create", () => {
       "mise install",
       "mise exec -- pnpm install --frozen-lockfile",
       "git add -A",
-      "git commit --no-verify -m chore: @glanz-creative/starter の vite テンプレートから作成 -m 参照元: GLANZ-CREATIVE/starter@main",
+      "git commit --no-verify -m chore: @glanz-creative/starter の vite テンプレート（Vanilla CSS）から作成 -m 参照元: GLANZ-CREATIVE/starter@main",
     ]);
   });
 
   test("取得元のコミットがわかれば、最初のコミットの本文に参照元として残す", async () => {
     await create({
       template: "vite",
+      css: "vanilla",
       dir: "my-site",
       ref: "main",
       cwd,
@@ -132,6 +164,7 @@ describe("create", () => {
   test("mise がなければ警告して pnpm を直接使う", async () => {
     const { warnings } = await create({
       template: "vite",
+      css: "vanilla",
       dir: "my-site",
       ref: "main",
       cwd,
@@ -148,6 +181,7 @@ describe("create", () => {
     const messages = [];
     await create({
       template: "vite",
+      css: "vanilla",
       dir: "my-site",
       ref: "main",
       cwd,

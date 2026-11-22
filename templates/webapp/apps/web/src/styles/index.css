@@ -1,0 +1,7 @@
+/*
+ * レイヤー: reset < theme
+ */
+@layer reset, theme;
+
+@import "./reset.css" layer(reset);
+@import "./theme.css" layer(theme);

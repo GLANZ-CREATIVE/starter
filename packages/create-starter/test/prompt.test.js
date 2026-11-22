@@ -22,7 +22,7 @@ function prompts(handlers) {
 }
 
 describe("ask", () => {
-  test("テンプレートとプロジェクト名が揃っていれば聞かない", async () => {
+  test("テンプレート・プロジェクト名・CSS の方式が揃っていれば聞かない", async () => {
     const ui = prompts({
       select: () => {
         throw new Error("select");
@@ -32,9 +32,10 @@ describe("ask", () => {
       },
     });
 
-    assert.deepEqual(await ask({ template: "vite", dir: "my-site", isTTY: false, prompts: ui }), {
+    assert.deepEqual(await ask({ template: "vite", dir: "my-site", css: "tailwind", isTTY: false, prompts: ui }), {
       template: "vite",
       dir: "my-site",
+      css: "tailwind",
     });
     assert.deepEqual(ui.calls, []);
   });
@@ -43,18 +44,34 @@ describe("ask", () => {
     await assert.rejects(ask({ isTTY: false, prompts: prompts({}) }), /使い方/);
   });
 
-  test("未指定ならプロジェクト名、テンプレートの順に聞く", async () => {
+  test("対話できないときは CSS の方式も引数で必要", async () => {
+    await assert.rejects(ask({ template: "vite", dir: "my-site", isTTY: false, prompts: prompts({}) }), /--css <vanilla \/ tailwind>/);
+  });
+
+  test("未指定ならプロジェクト名、テンプレート、CSS の方式の順に聞く", async () => {
+    const answers = ["astro", "tailwind"];
     const ui = prompts({
       text: () => "my-site",
-      select: () => "astro",
+      select: () => answers.shift(),
     });
 
-    assert.deepEqual(await ask({ isTTY: true, prompts: ui }), { template: "astro", dir: "my-site" });
+    assert.deepEqual(await ask({ isTTY: true, prompts: ui }), { template: "astro", dir: "my-site", css: "tailwind" });
     assert.deepEqual(
       ui.calls.map(([kind, question]) => [kind, question.message]),
       [
         ["text", "プロジェクト名は？"],
         ["select", "どのテンプレートで始めますか？"],
+        ["select", "CSS はどの方式で書きますか？"],
+      ],
+    );
+    assert.deepEqual(
+      ui.calls[2][1].options.map((option) => ({
+        value: option.value,
+        label: stripVTControlCharacters(option.label),
+      })),
+      [
+        { value: "vanilla", label: "Vanilla CSS  reset.css と @layer で書く" },
+        { value: "tailwind", label: "Tailwind CSS  ユーティリティクラスで書く" },
       ],
     );
     assert.equal(ui.calls[0][1].placeholder, "my-site");
@@ -73,7 +90,7 @@ describe("ask", () => {
     );
   });
 
-  test("テンプレートだけ指定されていればプロジェクト名だけ聞く", async () => {
+  test("テンプレートと CSS の方式が指定されていればプロジェクト名だけ聞く", async () => {
     const ui = prompts({
       text: () => "my-site",
       select: () => {
@@ -81,11 +98,23 @@ describe("ask", () => {
       },
     });
 
-    assert.deepEqual(await ask({ template: "vite", isTTY: true, prompts: ui }), { template: "vite", dir: "my-site" });
+    assert.deepEqual(await ask({ template: "vite", css: "vanilla", isTTY: true, prompts: ui }), { template: "vite", dir: "my-site", css: "vanilla" });
     assert.deepEqual(
       ui.calls.map(([kind]) => kind),
       ["text"],
     );
+  });
+
+  test("存在しない CSS の方式なら、選び直す", async () => {
+    const ui = prompts({
+      select: () => "vanilla",
+      text: () => {
+        throw new Error("text");
+      },
+    });
+
+    assert.deepEqual(await ask({ template: "vite", dir: "my-site", css: "sass", isTTY: true, prompts: ui }), { template: "vite", dir: "my-site", css: "vanilla" });
+    assert.match(ui.calls[0][1].message, /sass/);
   });
 
   test("存在しないテンプレート名なら、選び直してからプロジェクト名を聞く", async () => {
@@ -94,7 +123,7 @@ describe("ask", () => {
       text: () => "my-site",
     });
 
-    await ask({ template: "laravel", isTTY: true, prompts: ui });
+    await ask({ template: "laravel", css: "vanilla", isTTY: true, prompts: ui });
     assert.equal(ui.calls[0][0], "select");
     assert.match(ui.calls[0][1].message, /laravel/);
     assert.equal(ui.calls[1][0], "text");
@@ -110,7 +139,7 @@ describe("ask", () => {
       select: () => "vite",
     });
 
-    await ask({ template: "vite", isTTY: true, prompts: ui });
+    await ask({ template: "vite", css: "vanilla", isTTY: true, prompts: ui });
     assert.equal(validate(""), "プロジェクト名を入力してください。");
     assert.match(validate("My Site"), /package\.json の name/);
     assert.equal(validate("my-site"), undefined);

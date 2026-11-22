@@ -1,0 +1,27 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-recess-order"],
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$",
+    "custom-property-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "at-rule-no-unknown": [true, { "ignoreAtRules": ["import", "layer"] }],
+    "order/properties-alphabetical-order": null,
+    "no-invalid-position-at-import-rule": null,
+    "import-notation": null,
+    "declaration-property-value-no-unknown": [true, { "ignoreProperties": { "/.+/": "/--(alpha|spacing)\\(/" } }]
+  },
+  "languageOptions": {
+    "syntax": {
+      "atRules": {
+        "theme": { "prelude": "[ inline | static | reference | default ]*" },
+        "source": { "prelude": "<string> | not <string> | inline( <string> )" },
+        "utility": { "prelude": "<any-value>" },
+        "variant": { "prelude": "<any-value>" },
+        "custom-variant": { "prelude": "<any-value>" },
+        "apply": { "prelude": "<any-value>" },
+        "reference": { "prelude": "<string>" }
+      }
+    }
+  },
+  "ignoreFiles": ["theme/dist/**/*.css", "theme/style.css", "theme/**/reset.css"]
+}

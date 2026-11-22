@@ -1,0 +1,4 @@
+{
+  "remove": ["src/reset.css"],
+  "extends": []
+}

@@ -10,7 +10,6 @@ Astro 7 + TypeScript + ESLint + Stylelint + Prettier + Markuplint のテンプ�
 - [astro-seo](https://github.com/jonasmerlin/astro-seo)（OG / Twitter Card 対応）
 - [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
 - [astro-robots-txt](https://github.com/alextim/astro-lib/tree/main/packages/astro-robots-txt)
-- [kiso.css v1.2.4](https://github.com/tak-dcxi/kiso.css)（日本語Web向けリセットCSS）
 - [ESLint](https://eslint.org)（astro / typescript-eslint / simple-import-sort）
 - [Stylelint](https://stylelint.io)（standard + recess-order）
 - [Prettier](https://prettier.io)（prettier-plugin-astro）
@@ -59,8 +58,7 @@ pnpm install
 │   ├── pages/
 │   │   └── index.astro
 │   └── styles/
-│       ├── global.css
-│       └── kiso.css
+│       └── global.css   # BaseLayout.astro が読み込む CSS の入口
 └── package.json
 ```
 
@@ -83,9 +81,6 @@ export default defineConfig({
 });
 ```
 
-## CSS の拡張
+## CSS
 
-Sass や Tailwind CSS は次の手順で足せます。
-
-- [Sass を使う](docs/sass.md)
-- [Tailwind CSS を使う](docs/tailwind.md)
+CSS の方式（Vanilla CSS / Tailwind CSS）は、作成時に create-starter で選んだものです。書き方は [docs/css.md](docs/css.md) にまとめています。

@@ -62,13 +62,15 @@ vite.config.ts   整形・静的解析・フックで実行する処理の設定
 - パッケージ間の依存は `workspace:*`、外部の依存の版は `pnpm-workspace.yaml` の `catalog` でそろえます
 - `packages/*` はビルドしません。`exports` が `src/*.ts` を直接指し、使う側（Vite と Vitest）がそのまま読み込みます
 
+CSS の方式（Vanilla CSS / Tailwind CSS）は、作成時に create-starter で選んだものです。書き方は [docs/css.md](docs/css.md) にまとめています。
+
 ## 含めていないもの
 
 案件ごとに決めるものは入れていません。必要になったら足してください。
 
 - デプロイ先とその設定。決まったら `apps/api/src/index.ts` をその環境の入口に置き換えます（`app.ts` はそのまま使えます）
 - DB・ORM、認証
-- ルーター、状態管理、CSS の方式、UI ライブラリ
+- ルーター、状態管理、UI ライブラリ
 - E2E テスト
 
 ## Gitフック

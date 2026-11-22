@@ -19,6 +19,10 @@ React（`apps/web`）と Hono（`apps/api`）の Web アプリ。pnpm workspace 
 - web から api を呼ぶときは `apps/web/src/api.ts` の Hono RPC クライアントを使う。URL や型を手書きしない
 - `apps/api/src/app.ts` は実行環境に依存させない。環境ごとの起動処理は入口（`index.ts`）に置く
 
+## CSS
+
+- `docs/css.md` に従う
+
 ## Vite+
 
 - `vp <名前>` は組み込みコマンド、`vp run <名前>` は `package.json` のスクリプト。`vp dev` と `vp run dev` は別物

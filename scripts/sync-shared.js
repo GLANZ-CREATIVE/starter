@@ -1,18 +1,24 @@
 import { access, mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { registerHooks } from "node:module";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { TEMPLATE_NAMES as TEMPLATES } from "../packages/create-starter/lib/templates.js";
+import { CSS_METHODS, TEMPLATE_NAMES as TEMPLATES, VARIANT_MANIFEST } from "../packages/create-starter/lib/templates.js";
 
 export const GITIGNORE_MARKER = "# ---- template specific ----";
 
 const RESET_CSS_PATHS = {
   wordpress: "theme/src/assets/css/base/reset.css",
   vite: "src/assets/css/base/reset.css",
-  astro: null,
-  webapp: null,
+  astro: "src/styles/reset.css",
+  webapp: "apps/web/src/styles/reset.css",
 };
+
+// 差分を持つ CSS の方式。どれも Tailwind の preflight のようにリセットを自前で持つので、reset.css は配らない
+const VARIANTS = Object.entries(CSS_METHODS).flatMap(([name, { overlay }]) => (overlay ? [{ name, overlay }] : []));
+
+// 共通部分の版の更新を差分で取りこぼさないよう、差分に置くなら extends で検査させるファイル
+const MUST_EXTEND = new Set(["package.json", "pnpm-workspace.yaml"]);
 
 export function resetCssTargets(templates, paths) {
   const undecided = templates.filter((t) => !(t in paths));
@@ -162,10 +168,96 @@ async function loadFormatterConfig(root, t) {
   }
 }
 
+async function listFiles(dir) {
+  try {
+    const entries = await readdir(dir, { recursive: true, withFileTypes: true });
+    return entries.filter((entry) => entry.isFile()).map((entry) => relative(dir, join(entry.parentPath, entry.name)).replaceAll("\\", "/"));
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+}
+
+async function listDirs(dir) {
+  try {
+    return (await readdir(dir, { withFileTypes: true })).filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+}
+
+const normalizeLine = (line) => line.trim().replace(/,$/, "");
+
+// base の空行以外の行が、同じ順で current に含まれていなければ、最初に見つからない行を返す
+function firstMissingLine(base, current) {
+  const lines = current.split("\n").map(normalizeLine);
+  let index = 0;
+  for (const line of base.split("\n").map(normalizeLine)) {
+    if (line === "") continue;
+    const found = lines.indexOf(line, index);
+    if (found === -1) return line;
+    index = found + 1;
+  }
+}
+
+async function checkVariant(root, variant, t, sharedTargets) {
+  const problems = [];
+  const dir = `${variant.overlay}/${t}`;
+  const raw = await readOptional(join(root, dir, VARIANT_MANIFEST));
+  if (raw === undefined) return [`${dir}/${VARIANT_MANIFEST} がない`];
+  const { remove = [], extends: extended = [] } = JSON.parse(raw);
+
+  for (const file of remove) {
+    if (!(await exists(join(root, `templates/${t}`, file)))) problems.push(`${dir}/${VARIANT_MANIFEST} の remove にある ${file} が templates/${t} にない`);
+  }
+  const reset = RESET_CSS_PATHS[t];
+  if (reset && !remove.includes(reset)) {
+    problems.push(`${dir}/${VARIANT_MANIFEST} の remove に ${reset} がない（${variant.name} では reset.css を配らない）`);
+  }
+
+  const files = await listFiles(join(root, dir));
+  for (const file of files) {
+    if (sharedTargets.has(`templates/${t}/${file}`)) problems.push(`${dir}/${file} は shared/ から配るファイルなので差分に置かない`);
+    const name = file.split("/").at(-1);
+    if (MUST_EXTEND.has(name) && !extended.includes(file)) {
+      problems.push(`${dir}/${VARIANT_MANIFEST} の extends に ${file} がない（共通部分の変更を取り込めているか検査できない）`);
+    }
+  }
+
+  for (const file of extended) {
+    const base = await readOptional(join(root, `templates/${t}`, file));
+    const current = await readOptional(join(root, dir, file));
+    if (base === undefined || current === undefined) {
+      problems.push(`${dir}/${VARIANT_MANIFEST} の extends にある ${file} が templates/${t} か ${dir} にない`);
+      continue;
+    }
+    const missing = firstMissingLine(base, current);
+    if (missing !== undefined) problems.push(`${dir}/${file} に templates/${t}/${file} の「${missing}」が入っていない`);
+  }
+
+  if ((await exists(join(root, `templates/${t}/pnpm-lock.yaml`))) && !files.includes("pnpm-lock.yaml")) {
+    problems.push(`${dir}/pnpm-lock.yaml がない（pnpm lock:variants で作る）`);
+  }
+  return problems;
+}
+
+async function checkVariants(root, sharedTargets) {
+  const problems = [];
+  for (const variant of VARIANTS) {
+    for (const t of TEMPLATES) problems.push(...(await checkVariant(root, variant, t, sharedTargets)));
+    for (const name of await listDirs(join(root, variant.overlay))) {
+      if (!TEMPLATES.includes(name)) problems.push(`${variant.overlay}/${name} が create-starter の TEMPLATES にない`);
+    }
+  }
+  return problems;
+}
+
 export async function check(root) {
   const problems = [];
 
-  for (const { source, target, content } of await expectedFiles(root)) {
+  const expected = await expectedFiles(root);
+  for (const { source, target, content } of expected) {
     if ((await readOptional(join(root, target))) !== content) problems.push(`${target} が ${source} と一致しない`);
   }
 
@@ -222,6 +314,8 @@ export async function check(root) {
     problems.push("pnpm-workspace.yaml に templates/ を入れない（各テンプレートは自分の lockfile を持つ単体のプロジェクト）");
   }
 
+  problems.push(...(await checkVariants(root, new Set(expected.map(({ target }) => target)))));
+
   return problems;
 }
 
@@ -231,7 +325,7 @@ if (import.meta.main) {
     const problems = await check(root);
     for (const problem of problems) console.error(`✗ ${problem}`);
     if (problems.length > 0) {
-      console.error("\n`pnpm sync:shared` で配り直すか、テンプレートの設定ファイルを直してください。");
+      console.error("\n`pnpm sync:shared` で配り直すか、テンプレートや差分（variants/）のファイルを直してください。");
       process.exit(1);
     }
     console.log("✓ shared/ とテンプレートはそろっています");

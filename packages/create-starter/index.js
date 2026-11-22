@@ -34,11 +34,12 @@ try {
   const args = parseCliArgs(process.argv.slice(2));
   p.intro(`${pc.bgCyan(pc.black(" create-starter "))} ${pc.dim(`v${version}`)}`);
 
-  const { template, dir } = await ask({ ...args, isTTY: stdin.isTTY });
+  const { template, dir, css } = await ask({ ...args, isTTY: stdin.isTTY });
   const localDir = process.env.CREATE_STARTER_LOCAL_DIR;
 
   const { warnings } = await create({
     template,
+    css,
     dir,
     ref: args.ref,
     cwd: process.cwd(),
