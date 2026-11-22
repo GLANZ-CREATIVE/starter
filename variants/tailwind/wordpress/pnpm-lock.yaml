@@ -163,14 +163,14 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  minimatch: '>=3.1.4'
-  serialize-javascript: '>=7.0.5'
-  linkify-it: '>=5.0.2'
-  adm-zip: '>=0.6.0'
-  fast-xml-parser: '>=5.10.1'
-  markdown-it: '>=14.1.2'
-  '@opentelemetry/core': '>=2.8.0'
-  body-parser@1: '>=1.20.6'
+  minimatch: '>=3.1.4 <11'
+  serialize-javascript: '>=7.0.5 <8'
+  linkify-it: '>=5.0.2 <7'
+  adm-zip: '>=0.6.0 <0.7'
+  fast-xml-parser: '>=5.10.1 <6'
+  markdown-it: '>=14.1.2 <16'
+  '@opentelemetry/core': '>=2.8.0 <3'
+  body-parser@1: '>=1.20.6 <3'
   brace-expansion: '>=5.0.9 <6'
   fast-uri: '>=4.1.2 <5'
   js-yaml@3: '>=3.15.1 <4'
@@ -1989,7 +1989,7 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
-      '@opentelemetry/core': '>=2.8.0'
+      '@opentelemetry/core': '>=2.8.0 <3'
       '@opentelemetry/exporter-trace-otlp-http': '>=0.57.0 <1'
       '@opentelemetry/instrumentation': '>=0.57.1 <1'
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0
@@ -2014,7 +2014,7 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
-      '@opentelemetry/core': '>=2.8.0'
+      '@opentelemetry/core': '>=2.8.0 <3'
       '@opentelemetry/sdk-trace-base': ^1.30.1 || ^2.1.0
 
   '@sentry/server-utils@10.75.3':
@@ -4831,8 +4831,8 @@ packages:
     resolution: {integrity: sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==}
     engines: {node: '>=0.10'}
 
-  launch-editor@2.14.1:
-    resolution: {integrity: sha512-QWBrQsMpH7gPr965dsKD/3cKWiNoTjpATQf++Xq63N6sKRGMwlVXz41O1IZTMfZQgBctD/K5Zt06+/I6pP6+HA==}
+  launch-editor@2.14.2:
+    resolution: {integrity: sha512-NHJEb30MGBCkmZXLZwz25t37QR4aY03ZzPYUJXOJaOa92uWwExI9SBQUuIznBYc1xkD7cJNGX7oc3Nl3sq2kQQ==}
 
   lefthook-android-arm64@2.2.2:
     resolution: {integrity: sha512-wb9rQQFLX7u1dJLxvMrq9VUfMYi5kxM7tJQ6Y4mWEOwaU+SmIm2wjoT/nromKq27Y8fh2Qd7FgCD3G1wfW8CnQ==}
@@ -6354,8 +6354,8 @@ packages:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
 
-  shell-quote@1.10.0:
-    resolution: {integrity: sha512-w1aiOKwKuRgtwAReIIj89puqg+I7GvX4IbLrvmhXbzQsj1+Zwi4VO3+fa6ZF91TWSjIxoEkKnMeHcLEODK5ZXA==}
+  shell-quote@1.12.0:
+    resolution: {integrity: sha512-PcByqNyT/38F2kDNi006HAMRJaULuBzq/FOsw3qdZvX/GA9W/jamDaRskgHjubHiftXK5sIFxLNkvrXUwcof6Q==}
     engines: {node: '>= 0.4'}
 
   side-channel-list@1.0.1:
@@ -12436,10 +12436,10 @@ snapshots:
     dependencies:
       language-subtag-registry: 0.3.23
 
-  launch-editor@2.14.1:
+  launch-editor@2.14.2:
     dependencies:
       picocolors: 1.1.1
-      shell-quote: 1.10.0
+      shell-quote: 1.12.0
 
   lefthook-android-arm64@2.2.2:
     optional: true
@@ -14117,7 +14117,7 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  shell-quote@1.10.0: {}
+  shell-quote@1.12.0: {}
 
   side-channel-list@1.0.1:
     dependencies:
@@ -14893,7 +14893,7 @@ snapshots:
       graceful-fs: 4.2.11
       http-proxy-middleware: 4.2.2(supports-color@10.2.2)
       ipaddr.js: 2.5.0
-      launch-editor: 2.14.1
+      launch-editor: 2.14.2
       open: 11.0.4
       p-retry: 8.0.1
       schema-utils: 4.5.0

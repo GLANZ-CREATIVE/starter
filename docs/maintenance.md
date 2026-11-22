@@ -56,10 +56,14 @@ variants/tailwind/         Tailwind CSS 版の差分（templates/<名前>/ に�
 共通部分を直したら、差分の側も追いかけます。
 
 1. `pnpm check:shared` が、差分の `extends` のファイルに取り込まれていない行を報告します。差分のファイルを同じように直します
-2. 依存を変えたときは `pnpm lock:variants [テンプレート名...]` で差分の lockfile を作り直します。一時フォルダで差分を重ねてから `pnpm install --lockfile-only` を実行します
+2. 依存を変えたときは `pnpm lock:variants [テンプレート名...]` で差分の lockfile を作り直します。一時フォルダで差分を重ね、共通部分の lockfile をもとに `pnpm install --lockfile-only` を実行するので、共通部分で上げた版がそのまま差分にも入ります
 3. `extends` に入れていないファイル（CSS、`docs/css.md` など）は丸ごと置き換えているので、検査されません。共通部分の同じファイルを直したら、差分も見直します
 
-Dependabot は `templates/` だけを更新します。Dependabot の PR は差分の `package.json` とずれて `check:shared` で落ちるので、そのブランチで差分の `package.json` を直し、`pnpm lock:variants` を実行して push します。Tailwind CSS 自体の版も、差分の `package.json`（webapp は `pnpm-workspace.yaml` の `catalog`）を手で上げてから `pnpm lock:variants` を実行します。
+Dependabot は `templates/` だけを更新します。
+
+- `package.json` を変える PR は、差分の `package.json` とずれて `check:shared` で落ちます。そのブランチで差分の `package.json` を直し、`pnpm lock:variants` を実行して push します
+- lockfile だけを変える PR（間接依存の更新）は検査では落ちませんが、差分の lockfile には入りません。マージしたあと `pnpm lock:variants` を実行して PR を出します
+Tailwind CSS 自体の版も、差分の `package.json`（webapp は `pnpm-workspace.yaml` の `catalog`）を手で上げてから `pnpm lock:variants` を実行します。
 
 ## テンプレートを足す
 
