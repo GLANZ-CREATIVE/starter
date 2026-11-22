@@ -27,13 +27,13 @@
 
 ### ローカル環境構築
 
-**依存関係インストール**（Git フックも入ります）
+依存関係をインストールします。Git フックも入ります。
 
 ```sh
 pnpm install
 ```
 
-**サーバーの起動**
+サーバーを起動します。
 
 ```sh
 pnpm dev
@@ -61,21 +61,21 @@ http://localhost:5173/ で起動します。本番と同じく Workers の実行
 1. `pnpm --filter @repo/web exec cf auth login` で Cloudflare にログインする
 2. `pnpm run deploy` を実行する（中身は `apps/web` での `cf deploy`）
 
-DB やストレージを使うときは、`cloudflare.config.ts` の `env` にバインディングを足します。ドキュメントには Wrangler（`wrangler.jsonc`）の書き方しか載っていないことがありますが、このプロジェクトでは `cloudflare.config.ts` に書き換えて使い、Wrangler は入れません。
+DB やストレージを使うときは、`cloudflare.config.ts` の `env` にバインディングを足します。Cloudflare のドキュメントには Wrangler（`wrangler.jsonc`）の書き方しか載っていないことがありますが、このプロジェクトでは `cloudflare.config.ts` に書き換えて使い、Wrangler は入れません。
 
-デプロイ先が決まっていない案件も、このまま開発を始めて構いません。Workers で動くコードはほかの環境でも動きます。ほかの環境に移すときは、`apps/api/src/index.ts`（入口）と `apps/web` の Cloudflare の設定を差し替えます（`app.ts` はそのまま使えます）。
+デプロイ先が決まっていない案件も、このまま開発を始めて構いません。Workers で動くコードはほかの環境でも動きます。ほかの環境に移すときは、`apps/api/src/index.ts`（エントリポイント）と `apps/web` の Cloudflare の設定を差し替えます（`app.ts` はそのまま使えます）。
 
 ## 構成
 
 ```
 apps/web/        React の画面。Hono RPC（hc）で api を型付きで呼ぶ。cloudflare.config.ts に Worker の設定
-apps/api/        Hono の API。app.ts が本体、index.ts は Workers の入口
+apps/api/        Hono の API。app.ts が本体、index.ts は Workers のエントリポイント
 packages/core/   zod のスキーマ。api の入力検証と web のフォーム検証の両方で使う
 packages/ui/     React の部品
 vite.config.ts   整形・静的解析・フックで実行する処理の設定（全パッケージ共通）
 ```
 
-- パッケージ間の依存は `workspace:*`、外部の依存の版は `pnpm-workspace.yaml` の `catalog` でそろえます
+- パッケージ間の依存は `workspace:*`、外部の依存のバージョンは `pnpm-workspace.yaml` の `catalog` でそろえます
 - `packages/*` はビルドしません。`exports` が `src/*.ts` を直接指し、使う側（Vite と Vitest）がそのまま読み込みます
 
 CSS の方式（Vanilla CSS / Tailwind CSS）は、作成時に create-starter で選んだものです。書き方は [docs/css.md](docs/css.md) にまとめています。

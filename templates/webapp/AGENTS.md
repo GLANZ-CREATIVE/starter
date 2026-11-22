@@ -5,7 +5,7 @@ React（`apps/web`）と Hono（`apps/api`）の Web アプリ。pnpm workspace 
 ## 作業の流れ
 
 - 作業を終える前に `pnpm fix` と `pnpm test` を実行する
-- 外部の依存は `pnpm-workspace.yaml` の `catalog` に版を書き、`package.json` では `catalog:` を指定する
+- 外部の依存は `pnpm-workspace.yaml` の `catalog` にバージョンを書き、`package.json` では `catalog:` を指定する
 
 ## 規約
 
@@ -17,14 +17,14 @@ React（`apps/web`）と Hono（`apps/api`）の Web アプリ。pnpm workspace 
 
 - 入力の形と検証ルールは `packages/core` の zod スキーマに置き、api と web で共有する。api は境界で検証し、内部では型を信頼する
 - web から api を呼ぶときは `apps/web/src/api.ts` の Hono RPC クライアントを使う。URL や型を手書きしない
-- `apps/api/src/app.ts` は実行環境に依存させない。環境ごとの起動処理は入口（`index.ts`）に置く
+- `apps/api/src/app.ts` は実行環境に依存させない。環境ごとの起動処理はエントリポイント（`index.ts`）に置く
 - api のコードは Workers で動く Web 標準の API で書く。Node.js 専用の API（`node:fs` など）は使わない
 - D1・KV・R2 などの Cloudflare 固有のサービス（バインディング）は、デプロイ先が Cloudflare に決まってから使う
 
 ## Cloudflare
 
 - Cloudflare の操作は `cf` CLI で行う。Wrangler を入れない、`wrangler.jsonc` を作らない
-- ドキュメントの `wrangler` コマンドや `wrangler.jsonc` の設定は、そのまま使わず `cf` と `cloudflare.config.ts` に置き換える。対応は https://developers.cloudflare.com/cf/wrangler/reference/ で調べ、記憶で置き換えない
+- Cloudflare のドキュメントにある `wrangler` コマンドや `wrangler.jsonc` の設定は、そのまま使わず `cf` と `cloudflare.config.ts` に置き換える。対応は https://developers.cloudflare.com/cf/wrangler/reference/ で調べ、記憶で置き換えない
 - `cf deploy` は本番に公開する。人に頼まれたときだけ実行し、確認には `cf deploy --dry-run` を使う
 
 ## CSS
