@@ -9,7 +9,7 @@
 
 ## 開発環境
 
-- Node.js 24 以上
+- Node.js 26 以上
 - pnpm 12 以上
 - [Vite+](https://viteplus.dev/)（Vite / Vitest / Oxlint / Oxfmt / タスクランナー）
 - [React](https://react.dev/)
