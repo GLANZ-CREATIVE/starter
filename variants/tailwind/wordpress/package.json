@@ -52,7 +52,7 @@
     "vite-plugin-image-optimizer": "^2.0.3"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=26"
   },
   "browserslist": [
     "> 0.5%",
